@@ -171,3 +171,12 @@ button, .pick, .btn, input, select { touch-action: manipulation; }
   #gb { height: calc(100vw - 8px); }
   #desk { display: none; }
 }
+
+/* pass screen: full-screen takeover */
+.av.huge { width: min(62vw, 240px); height: min(62vw, 240px); animation: pulse 0.8s steps(2) infinite; }
+.scr.pass { width: 100%; }
+.scr.pass .big { font-size: 22px; animation: pulse 0.8s steps(2) infinite; }
+.scr.pass .big.y { font-size: 30px; }
+body.passing #back, body.passing #fs, body.passing #menu { visibility: hidden !important; }
+body.passing #screen { animation: passflash .25s steps(2) 5; }
+@keyframes passflash { 50% { filter: invert(1); } }

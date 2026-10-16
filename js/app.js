@@ -26,11 +26,11 @@
     MUS.quiet = q;
     if (q) MUS.stop(); else MUS.start();
   }
-  function show(html) { card.innerHTML = html; S.frozen = false; setQuiet(false); }
+  function show(html) { document.body.classList.remove('passing'); card.innerHTML = html; S.frozen = false; setQuiet(false); }
   var showR = show;
   // input screens (typing, camera, private votes): the bomb fuse is frozen while someone is answering
   // they are also silent: no music, no SFX, no ticks
-  function showF(html) { card.innerHTML = html; S.frozen = true; setQuiet(true); }
+  function showF(html) { document.body.classList.remove('passing'); card.innerHTML = html; S.frozen = true; setQuiet(true); }
   function go(fn) { stopCam(); S.cur = fn; fn(); }
 
   var initCache = {};
@@ -460,8 +460,12 @@
     S.holder = i;
     go(function () {
       S.holder = i;
-      show('<div class="scr center"><div class="grow"></div><div class="big">GEEF DE GSM AAN</div><div class="big y">' + esc(nm(i)) + '</div><div class="sub">NIET KIJKEN, LOSER.</div>' + av(i, 'xl') + '<div class="grow"></div>' + btn('ok', 'IK BEN ' + esc(nm(i)) + ', GO', '#3bd16f') + '</div>');
-      on('ok', function () { snd('ok'); next(); });
+      show('<div class="scr center pass"><div class="grow"></div>' + av(i, 'huge') + '<div class="big pp">GEEF DE GSM AAN</div><div class="big y pp">' + esc(nm(i)) + '!</div><div class="grow"></div>' + btn('ok', 'IK BEN ' + esc(nm(i)) + ', GO', '#3bd16f') + '</div>');
+      document.body.classList.add('passing');
+      snd('fanfare'); try { navigator.vibrate && navigator.vibrate([100, 50, 100]); } catch (e) {}
+      var t0 = Date.now(), fired = false;
+      function fire() { if (fired || Date.now() - t0 < 1000) return; fired = true; snd('ok'); next(); }
+      on('ok', fire); card.firstChild.addEventListener('click', fire);
     });
   }
 
