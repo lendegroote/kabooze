@@ -24,34 +24,35 @@
     });
   }
 
-  function newCanvas() {
+  function newCanvas(n) {
     var c = document.createElement('canvas');
-    c.width = c.height = SIZE;
+    c.width = c.height = n || SIZE;
     return c;
   }
 
   function fromFile(file) { return loadSource(file).then(process); }
   // src = canvas/img/bitmap, returns the 32x32 dithered canvas (sync, cheap enough for a live preview)
-  function process(src) {
+  function process(src, size) {
+      var N = size || SIZE;
       var w = src.width, h = src.height, s = Math.min(w, h);
       // centre-crop square, downscale in halving steps for a clean average
       var cur = document.createElement('canvas');
       cur.width = cur.height = s;
       cur.getContext('2d').drawImage(src, (w - s) / 2, (h - s) / 2, s, s, 0, 0, s, s);
-      while (cur.width > SIZE * 2) {
+      while (cur.width > N * 2) {
         var n = document.createElement('canvas');
-        n.width = n.height = Math.max(SIZE, cur.width >> 1);
+        n.width = n.height = Math.max(N, cur.width >> 1);
         var nx = n.getContext('2d');
         nx.imageSmoothingQuality = 'high';
         nx.drawImage(cur, 0, 0, n.width, n.height);
         cur = n;
       }
-      var small = newCanvas();
+      var small = newCanvas(N);
       var sx = small.getContext('2d');
       sx.imageSmoothingQuality = 'high';
-      sx.drawImage(cur, 0, 0, SIZE, SIZE);
-      var data = sx.getImageData(0, 0, SIZE, SIZE);
-      var px = data.data, lum = new Float32Array(SIZE * SIZE), i;
+      sx.drawImage(cur, 0, 0, N, N);
+      var data = sx.getImageData(0, 0, N, N);
+      var px = data.data, lum = new Float32Array(N * N), i;
       for (i = 0; i < lum.length; i++) {
         lum[i] = 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
       }
@@ -65,9 +66,9 @@
         lum[i] = Math.min(1, Math.max(0, (v - 0.5) * CONTRAST + 0.5));
       }
       // Bayer 4x4 ordered dither to 4 levels
-      for (var y = 0; y < SIZE; y++) {
-        for (var x = 0; x < SIZE; x++) {
-          var k = y * SIZE + x;
+      for (var y = 0; y < N; y++) {
+        for (var x = 0; x < N; x++) {
+          var k = y * N + x;
           var t = (BAYER[(y & 3) * 4 + (x & 3)] + 0.5) / 16;
           var lvl = Math.min(3, Math.floor(lum[k] * 3 + t));
           var c = PAL[lvl];

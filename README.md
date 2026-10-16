@@ -1,53 +1,47 @@
 # KABOOZE
 
-A savage pass-the-phone party drinking game with a hidden bomb, shown on a CRT-green Game Boy. 2 to 8 players, one phone, no build step (vanilla HTML/CSS/JS).
+Een gemeen Vlaams drinkspel voor aan tafel, met een verborgen bom. 2 tot 8 spelers, 1 gsm, geen build (gewone HTML/CSS/JS). Groen CRT-scherm in een dun pixel-Game Boy-kader.
 
-Play: https://lendegroote.github.io/kabooze/
+Speel: https://lendegroote.github.io/kabooze/
 
-Water counts. Know your limit.
+Water telt mee. Ken je limiet.
 
-## Flow (v3)
+## Spelverloop
 
-1. TITLE, START, HOW TO PLAY.
-2. SETUP A: add players (name + selfie). The selfie opens the camera with a live green dither preview (falls back to a photo picker if the camera is not available).
-3. SETUP B: the phone goes around. Each player gets a savage WHO-question about the table and taps one other player. Reroll button for the question. Nobody sees whose answer is whose.
-4. ROUND 1 WHO SAID IT: the screen shows "question > picked player". The current player guesses who gave that answer. Right: that person drinks 1 and plays next. Wrong: guesser drinks 1 and is locked out for 3 seconds (the bomb keeps ticking).
-5. ROUND 2 MOST LIKELY TO: 3 prompts, everyone votes in private, bar chart reveal, the top player drinks as many sips as votes.
-6. Loop with new questions, or finish with the drinks tally.
-7. THE BOMB: one hidden fuse (random 90 to 180 s) runs through the whole game. The top bar shows a mm:ss countdown (turns red-orange and blinks in the last 10 s). The tick speeds up as the fuse burns and the music speeds up a bit. When it blows, the holder of the phone gets KABOOM and the ROULETTE (personal only: DRINK 2/3, SHOT, TRUTH, DARE, CONFESS, DOUBLE NEXT ROUND, SAFE, and a rare 4% BUY A ROUND).
+1. TITEL: START, HOE SPEEL JE.
+2. SPELERS: naam + selfie (camera met live groene dither, of fotokiezer als de camera niet lukt).
+3. GEHEIMEN (per speler, in het geheim, de gsm gaat rond): duid iemand aan bij een vraag, biecht 1 ding (overslaan mag) en neem 1 foto met een willekeurige opdracht (overslaan mag). Geheimen en foto's blijven alleen in de localStorage van dit toestel.
+4. RONDES in willekeurige volgorde, elk ongeveer 5 beurten: WIE ZEI DIT, WIE ZOU HET EERST, HETE PATAT, DIT OF DAT, IK HEB NOG NOOIT, WIE HEEFT DIT GEBIECHT, WIENS FOTO IS DIT. Fout raden = 1 drinken + 3 seconden geblokkeerd, juist raden = die persoon drinkt 2 (of 1) en krijgt de gsm.
+5. DE BOM: 1 verborgen lont (90 tot 180 s), met een mm:ss-aftelling bovenaan (rood en knipperend in de laatste 10 s). De lont staat stil terwijl iemand typt, foto's neemt of in het geheim stemt, en loopt bij het doorgeven en raden. Bij KABOOM draait de houder van de gsm aan het ROULETTE-wiel (alleen voor jezelf, 4% kans op TRAKTEER EEN RONDE).
+6. Na alle rondes: nog een ronde of stoppen (tabel met slokken).
 
-## Controls
+## Bediening
 
-On the phone only MENU, BACK, FULL and text inputs (and the camera SNAP button) are touch. Everything in the game is the on-screen Game Boy: D-pad moves a highlighted option (inverted colours + blinking arrow), A confirms, B goes back. Big invisible hit areas, haptic tick on press.
+Alles is aanraken. Op laptop mag het toetsenbord: pijltjes + X (bevestigen), Z (terug), Enter (menu), Shift (geluid). Het menu (bovenaan) heeft DOORGAAN, OPNIEUW BEGINNEN, TERUG NAAR START, GELUID, MUZIEK, INHOUD en VOLLEDIG SCHERM (op iPhone: zet de pagina op je startscherm, dan start hij volledig scherm via manifest.json).
 
-| Game Boy | Keyboard |
-|---|---|
-| D-pad | Arrow keys |
-| A | X |
-| B | Z |
-| Menu | Enter |
-| SFX on/off | Shift |
+## Inhoud
 
-The menu has RESUME, RESTART, GO BACK TO START (asks "SURE? GAME IS LOST", players stay saved), SFX and MUSIC toggles. FULL = Fullscreen API; on iPhone Safari it shows a tip to add the page to the home screen (manifest + apple meta make it launch full screen).
+`data/content.json` is de bron (stabiele ids, Vlaams, HOOFDLETTERS). `js/content-fallback.js` is een gegenereerde kopie. Aanpassen: `python3 scripts/build-content.py`. `content.html` (menu, INHOUD) toont alles, met zoeken en VERWIJDER/ONGEDAAN per item. Verwijderde ids staan in localStorage `kabooze_removed`; KOPIEER VERWIJDERDE LIJST om ze definitief uit de repo te schrappen.
 
-## Run locally
+## Lokaal draaien
 
 ```
 python3 -m http.server 8080
 ```
 
-Open http://localhost:8080. Camera needs https or localhost (GitHub Pages is https).
+Camera werkt alleen via https of localhost (GitHub Pages is https).
 
-## Files
+## Bestanden
 
 ```
-index.html, style.css          shell, CRT + Game Boy styling, retro desk background
-js/app.js                      all screens, bomb fuse, roulette, controls, camera
-js/data.js                     questions, prompts, roulette slices, truths, dares
-js/audio.js                    Web Audio SFX + original oompah chiptune loop
-js/avatar.js, js/font.js       selfie to green dither avatar, 5x7 bitmap font
-manifest.json, assets/         web app manifest, icons, pressstart2p font, references
-briefs/                        agent briefs (manager)
+index.html, style.css          app-shell, CRT + Game Boy-kader, bureau-achtergrond
+js/app.js                      alle schermen, bom, roulette, camera, rondes
+js/data.js                     laadt content (fetch + inline fallback), verwijderde ids
+js/content-fallback.js         gegenereerd uit data/content.json
+js/audio.js                    Web Audio effecten + oorspronkelijke chiptune
+js/avatar.js, js/font.js       selfie en foto naar groene dither, 5x7 bitmaplettertype
+content.html, js/content.js    inhoudslijst met zoeken en verwijderen
+manifest.json, assets/         web app manifest, icoontjes, lettertype
 ```
 
-js/main.js, js/game.js and data/questions.js are leftovers of the old Snake version and are unused.
+js/main.js, js/game.js en data/questions.js zijn restanten van de oude Snake-versie en worden niet gebruikt.

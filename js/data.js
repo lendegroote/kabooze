@@ -1,9 +1,7 @@
 // Content loader. Source of truth: data/content.json (stable ids). js/content-fallback.js is a generated inline copy
 // used until/unless the fetch works. Items whose id is in localStorage "kabooze_removed" are skipped on this device.
 var QUESTIONS = [], PROMPTS = [], TRUTHS = [], DARES = [], ROULETTE = [], CATEGORIES = [], DILEMMAS = [], NEVERS = [];
-var REMOVED_KEY = 'kabooze_removed', CUSTOM_KEY = 'kabooze_custom';
-var CUSTOM_POSTS = [];   // {author, text}, matched to player names at game start
-function getCustom() { try { return JSON.parse(localStorage.getItem(CUSTOM_KEY)) || []; } catch (e) { return []; } }
+var REMOVED_KEY = 'kabooze_removed';
 function getRemoved() { try { return JSON.parse(localStorage.getItem(REMOVED_KEY)) || []; } catch (e) { return []; } }
 function applyContent(items) {
   var rm = getRemoved();
@@ -19,10 +17,7 @@ function applyContent(items) {
     if (!keep.length) keep = all;               // never leave a type empty
     m[1].length = 0;
     keep.forEach(function (x) { m[1].push(m[2](x)); });
-    getCustom().forEach(function (x) { if (x.type === m[0] && (x.text || x.a)) m[1].push(m[2](x)); });
   });
-  CUSTOM_POSTS.length = 0;
-  getCustom().forEach(function (x) { if (x.type === 'post' && x.text) CUSTOM_POSTS.push({ author: x.author || '', text: x.text }); });
 }
 applyContent(FALLBACK_CONTENT);
 try {

@@ -1,39 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b140b">
-<title>KABOOZE CONTENT</title>
+<title>KABOOZE INHOUD</title>
 <link rel="stylesheet" href="content.css">
 </head>
 <body>
 <main>
   <header>
-    <h1>KABOOZE CONTENT</h1>
-    <a class="b" href="index.html">BACK TO GAME</a>
+    <h1>KABOOZE INHOUD</h1>
+    <a class="b" href="index.html">TERUG NAAR HET SPEL</a>
   </header>
-  <p class="note">DELETE HIDES AN ITEM ON THIS DEVICE RIGHT AWAY. COPY THE LIST AND SEND IT TO THE MANAGER TO REMOVE THEM FOR GOOD.</p>
-  <input id="q" type="text" placeholder="SEARCH" autocomplete="off" spellcheck="false">
-  <div class="bar"><button class="b" id="copy">COPY REMOVED LIST</button><span id="rc"></span></div>
-  <details id="addbox" open>
-    <summary>ADD YOUR OWN</summary>
-    <p class="note">STORED ONLY ON THIS DEVICE. NEVER SENT ANYWHERE.</p>
-    <select id="ctype">
-      <option value="who">WHO QUESTION</option><option value="likely">MOST LIKELY TO</option><option value="post">WHO POSTED THIS</option>
-      <option value="truth">TRUTH</option><option value="dare">DARE</option><option value="category">HOT POTATO CATEGORY</option>
-      <option value="tot">THIS OR THAT (A | B)</option><option value="never">NEVER HAVE I EVER</option>
-    </select>
-    <input id="ctext" type="text" maxlength="120" placeholder="TEXT" autocomplete="off" spellcheck="false">
-    <input id="cauthor" type="text" maxlength="12" placeholder="PLAYER NAME THIS POST BELONGS TO" autocomplete="off" spellcheck="false" hidden>
-    <button id="cadd">ADD</button> <span id="cmsg" class="msg"></span>
-  </details>
-  <details id="packbox">
-    <summary>IMPORT PACK</summary>
-    <p class="note">PASTE A JSON ARRAY LIKE [{"type":"who","text":"WHO ...?"},{"type":"post","text":"...","author":"BERT"}]</p>
-    <textarea id="pack" rows="6" spellcheck="false" placeholder='[{"type":"post","text":"...","author":"BERT"}]'></textarea>
-    <button id="pimp">IMPORT</button> <span id="pmsg" class="msg"></span>
-  </details>
+  <p class="note">VERWIJDEREN VERBERGT EEN ITEM METEEN OP DIT TOESTEL. KOPIEER DE LIJST EN STUUR HEM DOOR OM ZE VOOR ALTIJD TE SCHRAPPEN.</p>
+  <input id="q" type="text" placeholder="ZOEKEN" autocomplete="off" spellcheck="false">
+  <div class="bar"><button class="b" id="copy">KOPIEER VERWIJDERDE LIJST</button><span id="rc"></span></div>
   <div id="list"></div>
 </main>
 <script src="js/content-fallback.js"></script>

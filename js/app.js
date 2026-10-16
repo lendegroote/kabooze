@@ -7,7 +7,7 @@
 
   var S = {
     players: loadPlayers(), snd: true, paused: false, modal: false, fuseOn: false, left: 0, acc: 0,
-    drinks: [], posts: [], askPosts: false, r3: null, dbl: [], rn: 0, total: 1, cur: null, holder: 0, ans: [], r1: null, r2: null, usedQ: [], inGame: false, draft: ''
+    drinks: [], secs: [], photos: [], askSec: false, r3: null, r4: null, dbl: [], rn: 0, total: 1, cur: null, holder: 0, ans: [], r1: null, r2: null, usedQ: [], inGame: false, frozen: false, draft: ''
   };
 
   // ---------- helpers ----------
@@ -21,9 +21,10 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S.players)); } catch (e) {} }
   function snd(n) { if (S.snd) try { SFX[n](); } catch (e) {} }
   function nm(i) { return S.players[i].name || ('P' + (i + 1)); }
-  function show(html) { card.innerHTML = html; card.classList.remove('rd'); }
-  // round choice screens: options are D-pad + A only (no touch)
-  function showR(html) { show(html); card.classList.add('rd'); }
+  function show(html) { card.innerHTML = html; S.frozen = false; }
+  var showR = show;
+  // input screens (typing, camera, private votes): the bomb fuse is frozen while someone is answering
+  function showF(html) { show(html); S.frozen = true; }
   function go(fn) { stopCam(); S.cur = fn; fn(); }
 
   var initCache = {};
@@ -107,7 +108,7 @@
     var now = performance.now(), dt = now - last; last = now;
     drawTimer();
     if (!S.fuseOn) MUS.mul = 1;
-    if (!S.fuseOn || S.paused || S.modal) return;
+    if (!S.fuseOn || S.paused || S.modal || S.frozen) return;
     S.left -= dt; S.acc += dt;
     var p = 1 - Math.max(S.left, 0) / S.total; MUS.mul = 1 + 0.25 * p;
     var iv = 1000 * Math.pow(0.12, Math.pow(p, 1.7));
@@ -155,19 +156,19 @@
     if (r.k === 'dare') return DARES[rnd(DARES.length)];
     if (r.k === 'confess') {
       var a = S.ans.filter(function (x) { return x.by === who; })[0];
-      return a ? 'TELL THE TABLE WHO YOU PICKED FOR "' + a.q + '"' : 'TELL THE TABLE A SECRET.';
+      return a ? 'VERTEL DE TAFEL WIE JE AANDUIDDE BIJ "' + a.q + '"' : 'VERTEL DE TAFEL EEN GEHEIM.';
     }
     return r.d;
   }
   function roulette(who) {
     over.hidden = true; over.className = ''; over.onclick = null;
     S.modal = true; snd('fanfare');
-    show('<div class="scr center"><h2>' + esc(nm(who)) + ' SPINS!</h2><div class="wheelwrap"><div class="ptr"></div></div><div id="res" style="width:100%"></div></div>');
+    show('<div class="scr center"><h2>' + esc(nm(who)) + ' DRAAIT!</h2><div class="wheelwrap"><div class="ptr"></div></div><div id="res" style="width:100%"></div></div>');
     var w = card.querySelector('.wheelwrap'), c = wheelCanvas();
     w.appendChild(c);
     var hub = document.createElement('i'); hub.className = 'hub'; w.appendChild(hub);
     var res = $('#res');
-    res.innerHTML = btn('spin', 'TAP TO SPIN', '#ff3b3b');
+    res.innerHTML = btn('spin', 'TIK OM TE DRAAIEN', '#ff3b3b');
     var spun = false;
     function spin() {
       if (spun) return; spun = true; snd('go');
@@ -180,11 +181,11 @@
         var r = ROULETTE[i];
         if (r.k === 'drink') drink(who, r.c);
         if (r.k === 'double') S.dbl.push({ p: who, rn: S.rn + 1 });
-        res.innerHTML = '<div class="big y" style="margin-bottom:10px">' + r.n + '</div><div class="sub" style="margin-bottom:10px">' + esc(resultText(r, who)) + '</div>' + btn('cont', 'CONTINUE', '#3bd16f');
+        res.innerHTML = '<div class="big y" style="margin-bottom:10px">' + r.n + '</div><div class="sub" style="margin-bottom:10px">' + esc(resultText(r, who)) + '</div>' + btn('cont', 'VERDER', '#3bd16f');
         on('cont', function () { S.modal = false; MUS.hold = false; MUS.mul = 1; MUS.start(); resetFuse(); S.cur(); });
       }, 4400);
     }
-    on('spin', spin); c.addEventListener('click', spin);
+    on('spin', spin); c.addEventListener('click', spin); card.querySelector('.scr').addEventListener('click', spin);
   }
 
   // ---------- top bar / menu ----------
@@ -194,9 +195,9 @@
   }
   $('#back').addEventListener('click', function () {
     if (!over.hidden) return;
-    if (S.cam) { stopCam(); return setup(); }
+    if (S.cam) { var cb = S.cam.back; stopCam(); return cb ? cb() : setup(); }
     if (S.cur === setup) return go(title);
-    if (S.inGame) return confirmBox('QUIT THE GAME?', function () { stopGame(); go(setup); });
+    if (S.inGame) return confirmBox('SPEL STOPPEN?', function () { stopGame(); go(setup); });
     go(title);
   });
   $('#menu').addEventListener('click', function () {
@@ -204,20 +205,20 @@
     var was = S.paused; S.paused = true;
     function close() { over.hidden = true; over.className = ''; S.paused = was; }
     over.hidden = false; over.className = '';
-    over.innerHTML = '<div class="box"><h2>PAUSED</h2>' + btn('m1', 'RESUME', '#3bd16f') +
-      (S.inGame ? btn('m2', 'RESTART', '#ff9f1c') : '') + btn('m3', 'GO BACK TO START', '#3ec6ff') +
-      btn('m4', 'SFX: ' + (S.snd ? 'ON' : 'OFF'), '#ffd23f') + btn('m5', 'MUSIC: ' + (MUS.on ? 'ON' : 'OFF'), '#ffd23f') + btn('m6', 'CONTENT', '#3ec6ff') + btn('m7', 'FULLSCREEN', '#3ec6ff') + '</div>';
+    over.innerHTML = '<div class="box"><h2>PAUZE</h2>' + btn('m1', 'DOORGAAN', '#3bd16f') +
+      (S.inGame ? btn('m2', 'OPNIEUW BEGINNEN', '#ff9f1c') : '') + btn('m3', 'TERUG NAAR START', '#3ec6ff') +
+      btn('m4', 'GELUID: ' + (S.snd ? 'AAN' : 'UIT'), '#ffd23f') + btn('m5', 'MUZIEK: ' + (MUS.on ? 'AAN' : 'UIT'), '#ffd23f') + btn('m6', 'INHOUD', '#3ec6ff') + btn('m7', 'VOLLEDIG SCHERM', '#3ec6ff') + '</div>';
     on('m1', close);
     on('m2', function () { close(); stopGame(); startGame(); });
     on('m3', function () {
       close();
       if (!S.inGame) return go(title);
-      confirmBox('SURE? GAME IS LOST', function () { stopGame(); go(title); });
+      confirmBox('ZEKER? JE SPEL IS WEG', function () { stopGame(); go(title); });
     });
-    on('m4', function () { S.snd = !S.snd; $('#m4').textContent = 'SFX: ' + (S.snd ? 'ON' : 'OFF'); });
+    on('m4', function () { S.snd = !S.snd; $('#m4').textContent = 'GELUID: ' + (S.snd ? 'AAN' : 'UIT'); });
     on('m7', function () { close(); $('#fs').click(); });
     on('m6', function () { window.open('content.html', '_blank'); });
-    on('m5', function () { MUS.on = !MUS.on; if (MUS.on) MUS.start(); else MUS.stop(); $('#m5').textContent = 'MUSIC: ' + (MUS.on ? 'ON' : 'OFF'); });
+    on('m5', function () { MUS.on = !MUS.on; if (MUS.on) MUS.start(); else MUS.stop(); $('#m5').textContent = 'MUZIEK: ' + (MUS.on ? 'AAN' : 'UIT'); });
   });
   $('#fs').addEventListener('click', function () {
     var el = document.documentElement, fsEl = document.fullscreenElement || document.webkitFullscreenElement;
@@ -228,16 +229,19 @@
   });
   function tip() {
     over.hidden = false; over.className = '';
-    over.innerHTML = '<div class="box"><h2>FULL SCREEN</h2><div class="how"><div>ADD TO HOME SCREEN FOR FULL SCREEN</div></div>' + btn('tx', 'OK', '#3bd16f') + '</div>';
+    over.innerHTML = '<div class="box"><h2>VOLLEDIG SCHERM</h2><div class="how"><div>ZET HEM OP JE STARTSCHERM VOOR VOLLEDIG SCHERM</div></div>' + btn('tx', 'OK', '#3bd16f') + '</div>';
     on('tx', function () { over.hidden = true; });
   }
   function confirmBox(msg, yes) {
     over.hidden = false; over.className = '';
-    over.innerHTML = '<div class="box"><h2>' + msg + '</h2>' + btn('cy', 'YES', '#ff3b3b') + btn('cn', 'NO', '#3bd16f') + '</div>';
+    over.innerHTML = '<div class="box"><h2>' + msg + '</h2>' + btn('cy', 'JA', '#ff3b3b') + btn('cn', 'NEE', '#3bd16f') + '</div>';
     on('cy', function () { over.hidden = true; yes(); });
     on('cn', function () { over.hidden = true; });
   }
   document.addEventListener('pointerdown', function () { unlock(); MUS.start(); }, { once: true });
+  document.addEventListener('pointerdown', function (e) {
+    if (e.target.closest && e.target.closest('.btn,.pick,.thumb')) { try { navigator.vibrate && navigator.vibrate(10); } catch (x) {} }
+  }, true);
   document.addEventListener('visibilitychange', function () { if (document.hidden) MUS.stop(); else MUS.start(); });
 
 
@@ -249,7 +253,7 @@
   function curFoc() { return ctx().querySelector('.foc'); }
   function setFoc(e) {
     document.querySelectorAll('.foc').forEach(function (x) { x.classList.remove('foc'); });
-    if (e) { e.classList.add('foc'); try { e.scrollIntoView({ block: 'nearest' }); } catch (x) {} }
+    if (e && S.kb) { e.classList.add('foc'); try { e.scrollIntoView({ block: 'nearest' }); } catch (x) {} }
   }
   function autoFoc() {
     var c = ctx(), t = targets();
@@ -282,7 +286,7 @@
       return $('#back').click();
     }
     if (k === 'start') { var m = over.querySelector('#m1'); return m ? m.click() : (over.hidden && $('#menu').click()); }
-    if (k === 'select') { S.snd = !S.snd; var m4 = $('#m4'); if (m4) m4.textContent = 'SFX: ' + (S.snd ? 'ON' : 'OFF'); snd('ok'); }
+    if (k === 'select') { S.snd = !S.snd; var m4 = $('#m4'); if (m4) m4.textContent = 'GELUID: ' + (S.snd ? 'AAN' : 'UIT'); snd('ok'); }
   }
   document.querySelectorAll('#ctl [data-k]').forEach(function (b) {
     b.addEventListener('pointerdown', function (e) { e.preventDefault(); b.classList.add('dn'); try { navigator.vibrate && navigator.vibrate(10); } catch (x) {} press(b.dataset.k); });
@@ -292,20 +296,20 @@
   document.addEventListener('keydown', function (e) {
     var a = document.activeElement;
     if (a && a.tagName === 'INPUT') { if (e.key === 'Enter') a.blur(); return; }
-    if (KM[e.key]) { e.preventDefault(); press(KM[e.key]); }
+    if (KM[e.key]) { e.preventDefault(); S.kb = true; document.body.classList.add('usekey'); if (!curFoc()) autoFoc(); press(KM[e.key]); }
   });
 
   // ---------- title ----------
   function title() {
     S.cur = title; bar();
     show('<div class="scr center"><div class="logo"><span class="r">K</span><span class="o">A</span><span class="y">B</span><canvas class="bomb" width="16" height="16"></canvas><span class="g">O</span><span class="c">Z</span><span class="p">E</span></div>' +
-      '<div class="sub">THE PARTY GAME WITH A HIDDEN BOMB</div><div class="grow"></div><div class="inv-row"><canvas class="inv" width="11" height="8"></canvas><canvas class="bomb bigbomb" width="16" height="16"></canvas><canvas class="inv" width="11" height="8"></canvas></div><div class="grow"></div>' +
-      '<div style="width:100%">' + btn('start', 'START', '#3bd16f') + btn('how', 'HOW TO PLAY', '#3ec6ff', 'sm') + '</div></div>');
+      '<div class="sub">HET DRINKSPEL MET EEN VERBORGEN BOM</div><div class="grow"></div><div class="inv-row"><canvas class="inv" width="11" height="8"></canvas><canvas class="bomb bigbomb" width="16" height="16"></canvas><canvas class="inv" width="11" height="8"></canvas></div><div class="grow"></div>' +
+      '<div style="width:100%">' + btn('start', 'START', '#3bd16f') + btn('how', 'HOE SPEEL JE', '#3ec6ff', 'sm') + '</div></div>');
     card.querySelector('#how').style.width = '100%';
     on('start', function () { go(setup); });
     on('how', function () {
       over.hidden = false; over.className = '';
-      over.innerHTML = '<div class="box"><h2>HOW TO PLAY</h2><div class="how"><div>1. ADD EVERYONE. TAP SOMEONE FOR EACH QUESTION.</div><div>2. GUESS WHO PICKED WHO. WRONG GUESS = DRINK.</div><div>3. RIGHT GUESS = THAT PERSON DRINKS AND PLAYS NEXT.</div><div>4. THEN VOTE: WHO IS MOST LIKELY TO...</div><div>5. THE BOMB IS HIDDEN. DO NOT HOLD THE PHONE WHEN IT GOES KABOOM.</div><div class="y">WATER COUNTS. KNOW YOUR LIMIT.</div></div>' + btn('hx', 'GOT IT', '#3bd16f') + '</div>';
+      over.innerHTML = '<div class="box"><h2>HOE SPEEL JE</h2><div class="how"><div>1. VOEG IEDEREEN TOE. DUID VOOR ELKE VRAAG IEMAND AAN.</div><div>2. RAAD WIE WAT ZEI. FOUT = DRINKEN.</div><div>3. RAAK = DIE PERSOON DRINKT EN IS DAN AAN BEURT.</div><div>4. DAARNA: HETE PATAT, DIT OF DAT, IK HEB NOG NOOIT, GEBIECHTEN EN FOTOS.</div><div>5. DE BOM IS VERBORGEN. HOU DE GSM NIET VAST ALS HIJ KABOOM GAAT.</div><div class="y">WATER TELT MEE. KEN JE LIMIET.</div></div>' + btn('hx', 'SNAP IK', '#3bd16f') + '</div>';
       on('hx', function () { over.hidden = true; });
     });
   }
@@ -313,15 +317,15 @@
   // ---------- setup step A: players ----------
   function setup() {
     S.cur = setup; S.inGame = false; bar();
-    var P = S.players, h = '<div class="scr"><h2>WHO IS PLAYING?</h2><div class="scroll"><div class="grid c2" id="tiles">';
+    var P = S.players, h = '<div class="scr"><h2>WIE SPEELT MEE?</h2><div class="scroll"><div class="grid c2" id="tiles">';
     P.forEach(function (p, i) {
       h += '<div class="pcard" style="--k:' + COL[i % 8] + '"><div class="thumb" data-i="' + i + '">' + av(i, 'lg') + '</div>' +
-        '<input type="text" maxlength="8" placeholder="NAME" value="' + esc(p.name) + '" data-i="' + i + '" autocomplete="off" autocapitalize="characters" spellcheck="false">' +
+        '<input type="text" maxlength="8" placeholder="NAAM" value="' + esc(p.name) + '" data-i="' + i + '" autocomplete="off" autocapitalize="characters" spellcheck="false">' +
         '<div class="acts">' + btn('s' + i, 'SELFIE', COL[i % 8], 'sm') + (P.length > 2 ? btn('x' + i, 'X', '#ff3b3b', 'sm') : '') + '</div>' +
         '<input type="file" accept="image/*" capture="user" hidden data-i="' + i + '"></div>';
     });
-    h += '</div>' + (P.length < 8 ? btn('add', 'ADD PLAYER', '#3ec6ff') : '') + '</div><div class="toast" id="toast"></div>' + btn('go', "NEXT", '#3bd16f') + '</div>';
-    show(h);
+    h += '</div>' + (P.length < 8 ? btn('add', 'SPELER TOEVOEGEN', '#3ec6ff') : '') + '</div><div class="toast" id="toast"></div>' + btn('go', 'WE GAAN', '#3bd16f') + '</div>';
+    showF(h);
     card.querySelectorAll('.pcard').forEach(function (pc) {
       var i = +pc.querySelector('input[type=text]').dataset.i;
       var t = pc.querySelector('input[type=text]'), f = pc.querySelector('input[type=file]');
@@ -334,14 +338,14 @@
       pc.querySelector('#s' + i).addEventListener('click', pic);
       f.addEventListener('change', function () {
         if (!f.files[0]) return;
-        RemiAvatar.fromFile(f.files[0]).then(function (c) { P[i].av = c.toDataURL(); save(); pc.querySelector('img').src = P[i].av; }).catch(function () { $('#toast').textContent = 'PHOTO FAILED'; });
+        RemiAvatar.fromFile(f.files[0]).then(function (c) { P[i].av = c.toDataURL(); save(); pc.querySelector('img').src = P[i].av; }).catch(function () { $('#toast').textContent = 'FOTO MISLUKT'; });
       });
       var x = pc.querySelector('#x' + i);
       if (x) x.addEventListener('click', function () { P.splice(i, 1); initCache = {}; save(); setup(); });
     });
     on('add', function () { P.push({ name: '', av: '' }); save(); setup(); var s = card.querySelector('.scroll'); s.scrollTop = s.scrollHeight; });
     on('go', function () {
-      if (P.some(function (p) { return !p.name; })) { $('#toast').textContent = 'EVERYONE NEEDS A NAME'; snd('bad'); return; }
+      if (P.some(function (p) { return !p.name; })) { $('#toast').textContent = 'IEDEREEN HEEFT EEN NAAM NODIG'; snd('bad'); return; }
       save(); startGame();
     });
   }
@@ -353,63 +357,66 @@
     S.cam = null; clearInterval(c.iv);
     if (c.stream) c.stream.getTracks().forEach(function (t) { t.stop(); });
   }
-  function camSquare(v, t) {
+  function camSquare(v, t, flat) {
     var s = Math.min(v.videoWidth, v.videoHeight), g = t.getContext('2d');
-    g.save(); g.translate(t.width, 0); g.scale(-1, 1);
+    g.save(); if (!flat) { g.translate(t.width, 0); g.scale(-1, 1); }
     g.drawImage(v, (v.videoWidth - s) / 2, (v.videoHeight - s) / 2, s, s, 0, 0, t.width, t.height);
     g.restore(); return t;
   }
-  function camFail(i) {
+  function camFail(i, opt) {
     stopCam();
-    show('<div class="scr center"><div class="grow"></div><h2>NO CAMERA</h2><div class="sub">PICK OR TAKE A PHOTO INSTEAD.</div><div class="grow"></div><input type="file" id="cf" accept="image/*" capture="user" hidden>' + btn('cfb', 'CHOOSE PHOTO', '#3bd16f') + btn('cfx', 'BACK', '#ff9f1c') + '</div>');
+    showF('<div class="scr center"><div class="grow"></div><h2>GEEN CAMERA</h2><div class="sub">KIES OF MAAK EEN FOTO.</div><div class="grow"></div><input type="file" id="cf" accept="image/*" capture="user" hidden>' + btn('cfb', 'KIES FOTO', '#3bd16f') + btn('cfx', opt ? 'OVERSLAAN' : 'TERUG', '#ff9f1c') + '</div>');
     var f = $('#cf');
     on('cfb', function () { f.click(); });
-    on('cfx', setup);
+    on('cfx', function () { if (opt) opt.done(); else setup(); });
     f.addEventListener('change', function () {
       if (!f.files[0]) return;
+      if (opt) return fileToPhoto(f.files[0]).then(function (u) { opt.save(u); opt.done(); }).catch(function () { opt.done(); });
       RemiAvatar.fromFile(f.files[0]).then(function (c) { S.players[i].av = c.toDataURL(); save(); setup(); }).catch(function () { setup(); });
     });
   }
-  function camScreen(i) {
+  function camScreen(i, opt) {
     stopCam();
-    show('<div class="scr"><h2>SMILE, ' + esc(nm(i)) + '</h2><div class="grow camwrap"><canvas id="cv" width="32" height="32"></canvas></div><div class="toast" id="toast">STARTING CAMERA...</div><div id="cbtns" style="width:100%"></div></div>');
-    var cam = S.cam = { stream: null, iv: 0 };
+    var N = opt ? 64 : 32;
+    showF('<div class="scr"><h2>' + (opt ? esc(opt.prompt) : 'LACH, ' + esc(nm(i))) + '</h2><div class="grow camwrap"><canvas id="cv" width="' + N + '" height="' + N + '"></canvas></div><div class="toast" id="toast">CAMERA STARTEN...</div><div id="cbtns" style="width:100%"></div></div>');
+    var cam = S.cam = { stream: null, iv: 0, back: opt ? opt.done : null };
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false }).then(function (stream) {
       if (S.cam !== cam) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
       cam.stream = stream;
       var v = document.createElement('video'); v.muted = true; v.setAttribute('playsinline', ''); v.srcObject = stream; v.play();
       var cv = $('#cv'), g = cv.getContext('2d'), small = document.createElement('canvas'), big = document.createElement('canvas');
-      small.width = small.height = 64; big.width = big.height = 480;
+      small.width = small.height = N * 2; big.width = big.height = 480;
       $('#toast').textContent = '';
-      $('#cbtns').innerHTML = btn('snap', 'SNAP', '#3bd16f'); autoFoc();
-      cam.iv = setInterval(function () { if (v.videoWidth) g.drawImage(RemiAvatar.fromSource(camSquare(v, small)), 0, 0); }, 100);
+      $('#cbtns').innerHTML = btn('snap', 'FOTO!', '#3bd16f'); autoFoc();
+      cam.iv = setInterval(function () { if (v.videoWidth) g.drawImage(RemiAvatar.fromSource(camSquare(v, small, !!opt), N), 0, 0); }, 100);
       on('snap', function () {
         if (!v.videoWidth) return;
-        var out = RemiAvatar.fromSource(camSquare(v, big));
+        var out = RemiAvatar.fromSource(camSquare(v, big, !!opt), N);
         clearInterval(cam.iv); stream.getTracks().forEach(function (t) { t.stop(); });
         g.drawImage(out, 0, 0); snd('ok');
-        $('#cbtns').innerHTML = btn('use', 'USE IT', '#3bd16f') + btn('re', 'RETAKE', '#ff9f1c'); autoFoc();
-        on('use', function () { S.players[i].av = out.toDataURL(); save(); stopCam(); setup(); });
-        on('re', function () { camScreen(i); });
+        $('#cbtns').innerHTML = btn('use', 'GEBRUIK', '#3bd16f') + btn('re', 'OPNIEUW', '#ff9f1c'); autoFoc();
+        on('use', function () {
+          if (opt) { opt.save(toJpeg(big)); stopCam(); return opt.done(); }
+          S.players[i].av = out.toDataURL(); save(); stopCam(); setup();
+        });
+        on('re', function () { camScreen(i, opt); });
       });
-    }).catch(function () { if (S.cam === cam) camFail(i); });
+    }).catch(function () { if (S.cam === cam) camFail(i, opt); });
   }
 
   // ---------- game start ----------
   function stopGame() { S.fuseOn = false; S.inGame = false; S.modal = false; $('#tb').classList.remove('hot'); }
   function startGame() {
     S.drinks = S.players.map(function () { return 0; });
-    S.usedQ = []; S.dbl = []; S.rn = 0; S.posts = []; S.askPosts = true; S.inGame = true;
-    CUSTOM_POSTS.forEach(function (c) {
-      S.players.forEach(function (p, i) { if ((p.name || '').toLowerCase() === String(c.author).trim().toLowerCase()) S.posts.push({ by: i, text: c.text, used: false }); });
-    }); S.fuseOn = false; S.fresh = true; S.modal = false;
+    S.usedQ = []; S.dbl = []; S.rn = 0; S.secs = []; S.photos = []; S.askSec = true; S.inGame = true;
+    S.fuseOn = false; S.fresh = true; S.modal = false;
     secrets(0, []);
   }
   function pass(i, next) {
     S.holder = i;
     go(function () {
       S.holder = i;
-      show('<div class="scr center"><div class="grow"></div><div class="big">PASS TO</div><div class="big y">' + esc(nm(i)) + '</div><div class="sub">DON\'T PEEK, LOSER.</div>' + av(i, 'xl') + '<div class="grow"></div>' + btn('ok', "I'M " + esc(nm(i)) + ', GO', '#3bd16f') + '</div>');
+      show('<div class="scr center"><div class="grow"></div><div class="big">GEEF DE GSM AAN</div><div class="big y">' + esc(nm(i)) + '</div><div class="sub">NIET KIJKEN, LOSER.</div>' + av(i, 'xl') + '<div class="grow"></div>' + btn('ok', 'IK BEN ' + esc(nm(i)) + ', GO', '#3bd16f') + '</div>');
       on('ok', function () { snd('ok'); next(); });
     });
   }
@@ -422,20 +429,20 @@
   }
   function secrets(k, list) {
     if (k === 0) S.fuseOn = false;   // no fuse, tick or countdown while answers are being given
-    if (k >= S.players.length) { S.ans = list; S.askPosts = false; return startCycle(); }
+    if (k >= S.players.length) { S.ans = list; S.askSec = false; return startCycle(); }
     pass(k, function () {
       var q = newQ();
       go(function () {
         S.holder = k;
         var others = S.players.map(function (p, i) { return i; }).filter(function (i) { return i !== k; });
-        show('<div class="scr"><div class="quote"><div class="aa y">' + esc(q) + '</div></div>' +
-          '<div class="sub">PICK SOMEONE AT THE TABLE. NOBODY WILL KNOW IT WAS YOU... YET.</div>' +
-          '<div class="scroll">' + pickGrid(others) + '</div>' + btn('re', 'NEW QUESTION', '#ff9f1c', 'sm') + '</div>');
+        showF('<div class="scr"><div class="quote"><div class="aa y">' + esc(q) + '</div></div>' +
+          '<div class="sub">DUID IEMAND AAN DE TAFEL AAN. NIEMAND WEET DAT JIJ HET WAS... TOT NU.</div>' +
+          '<div class="scroll">' + pickGrid(others) + '</div>' + btn('re', 'ANDERE VRAAG', '#ff9f1c', 'sm') + '</div>');
         on('re', function () { S.usedQ.push(q); q = newQ(); S.cur(); });
         bindPicks(function (i) {
           S.usedQ.push(q); snd('ok');
           list.push({ by: k, q: q, pick: i });
-          if (S.askPosts) postScreen(k, function () { secrets(k + 1, list); }); else secrets(k + 1, list);
+          if (S.askSec) confessScreen(k, function () { photoScreen(k, function () { secrets(k + 1, list); }); }); else secrets(k + 1, list);
         });
         // reroll keeps the new question: S.cur re-reads q via closure
       });
@@ -461,12 +468,22 @@
     var a = r.left.splice(k, 1)[0], wrong = [];
     pass(r.g, function () { guess(a, wrong, r, 'q'); });
   }
+  function headerFor(a, kind) {
+    if (kind === 'conf') return '<div class="quote"><div class="aa y" style="font-size:14px">&quot;' + esc(a.text) + '&quot;</div></div><h2>WIE HEEFT DIT GEBIECHT?</h2>';
+    if (kind === 'photo') return '<div class="quote"><div class="qq" style="margin:0">' + esc(a.prompt) + '</div></div><canvas id="pimg" class="pimg" width="64" height="64"></canvas><h2>WIENS FOTO IS DIT?</h2>';
+    return '<div class="quote"><div class="qq">' + esc(a.q) + '</div><div class="aa y">&gt; ' + esc(nm(a.pick)) + '</div></div><h2>WIE ZEI DIT?</h2>';
+  }
+  function drawDither(cv, src, n) {
+    var im = new Image();
+    im.onload = function () { var t = document.createElement('canvas'); t.width = t.height = 128; t.getContext('2d').drawImage(im, 0, 0, 128, 128); cv.getContext('2d').drawImage(RemiAvatar.fromSource(t, n), 0, 0); };
+    im.src = src;
+  }
   function guess(a, wrong, L, kind) {
-    L = L || S.r1; var post = kind === 'post';
+    L = L || S.r1;
     var g = L.g, all = S.players.map(function (p, i) { return i; });
     go(function () {
       S.holder = g;
-      showR('<div class="scr">' + (post ? postCard(a.text) : '<div class="quote"><div class="qq">' + esc(a.q) + '</div><div class="aa y">&gt; ' + esc(nm(a.pick)) + '</div></div><h2>WHO SAID IT?</h2>') +
+      showR('<div class="scr">' + headerFor(a, kind) +
         '<div class="scroll">' + pickGrid(all, null, function (i) { return wrong.indexOf(i) >= 0 ? 'bad' : ''; }) + '</div><div class="cd big" id="cd"></div><div class="toast" id="toast"></div></div>');
       var tok = S.lockTok = {};
       function tick() {
@@ -476,14 +493,18 @@
         if (left > 0) { grid.classList.add('lock'); cd.textContent = Math.ceil(left / 1000); setTimeout(tick, 100); }
         else { grid.classList.remove('lock'); cd.textContent = ''; $('#toast').textContent = ''; }
       }
-      if (L.lockUntil > Date.now()) { $('#toast').textContent = 'NOPE. YOU KNOW NOBODY. ' + nm(g) + ' DRINK.'; tick(); }
+      if (L.lockUntil > Date.now()) { $('#toast').textContent = 'MIS. GE KENT NIEMAND. ' + nm(g) + ' DRINKT.'; tick(); }
+      if (kind === 'photo') drawDither($('#pimg'), a.img, 64);
       bindPicks(function (i, b) {
         if (L.lockUntil > Date.now()) return;
-        if (i === a.by) return post ? exposed(a, L, 2, 'POSTED THAT. DRINK 2, CRINGE.', nextPost) : exposed(a, L, 1, 'SAID IT. DRINK, SNITCH.', nextSecret);
+        if (i === a.by) {
+          if (kind === 'photo') return exposedPhoto(a, L);
+          return kind === 'conf' ? exposed(a, L, 2, 'HEEFT DIT GEBIECHT. DRINK 2.', nextConf) : exposed(a, L, 1, 'HEEFT HET GEZEGD. DRINK, KLIKSPAAN.', nextSecret);
+        }
         wrong.push(i); drink(g, 1); snd('bad');
         b.classList.add('shake', 'bad');
         L.lockUntil = Date.now() + 3000;
-        $('#toast').textContent = 'NOPE. YOU KNOW NOBODY. ' + nm(g) + ' DRINK.';
+        $('#toast').textContent = 'MIS. GE KENT NIEMAND. ' + nm(g) + ' DRINKT.';
         tick();
       });
     });
@@ -492,8 +513,8 @@
     snd('drink'); drink(a.by, n); L.g = a.by;
     go(function () {
       S.holder = a.by;
-      show('<div class="scr center"><div class="grow"></div><div class="big r">EXPOSED!</div>' + av(a.by, 'xl') + '<div class="big y" style="font-size:15px">' + esc(nm(a.by)) + ' ' + msg + '</div><div class="grow"></div>' +
-        btn('nx', 'GO TO ' + esc(nm(a.by)), '#3bd16f') + '</div>');
+      show('<div class="scr center"><div class="grow"></div><div class="big r">GESNAPT!</div>' + av(a.by, 'xl') + '<div class="big y" style="font-size:15px">' + esc(nm(a.by)) + ' ' + msg + '</div><div class="grow"></div>' +
+        btn('nx', 'GA NAAR ' + esc(nm(a.by)), '#3bd16f') + '</div>');
       on('nx', next);
     });
   }
@@ -515,7 +536,7 @@
     pass(v, function () {
       go(function () {
         S.holder = v;
-        showR('<div class="scr"><div class="quote"><div class="aa y">' + esc(r.prompts[r.p]) + '</div></div><div class="sub">TAP YOUR VOTE. SECRET!</div><div class="scroll">' + pickGrid(all) + '</div></div>');
+        showF('<div class="scr"><div class="quote"><div class="aa y">' + esc(r.prompts[r.p]) + '</div></div><div class="sub">STEM IN GEHEIM. NIET KIJKEN!</div><div class="scroll">' + pickGrid(all) + '</div></div>');
         bindPicks(function (i) { snd('ok'); r.votes.push(i); vote(v + 1); });
       });
     });
@@ -531,66 +552,115 @@
       cnt.forEach(function (c, i) {
         h += '<div class="bar' + (win.indexOf(i) >= 0 ? ' win' : '') + '" style="--k:' + COL[i % 8] + '">' + c + av(i, 'sm') + '<div class="col" style="height:' + (max ? Math.max(4, c / max * 120) : 4) + 'px"></div><span style="font-size:8px">' + esc(nm(i)) + '</span></div>';
       });
-      h += '</div><div class="big y">' + win.map(function (i) { return esc(nm(i)); }).join(' &amp; ') + ' DRINK' + (win.length > 1 ? '' : 'S') + ' ' + max + '</div><div class="sub">THE TABLE HAS SPOKEN.</div><div class="grow"></div>' + btn('nx', r.p < r.prompts.length - 1 ? 'NEXT' : 'DONE', '#3bd16f') + '</div>';
+      h += '</div><div class="big y">' + win.map(function (i) { return esc(nm(i)); }).join(' &amp; ') + (win.length > 1 ? ' DRINKEN ' : ' DRINKT ') + max + '</div><div class="sub">DE TAFEL HEEFT GESPROKEN.</div><div class="grow"></div>' + btn('nx', r.p < r.prompts.length - 1 ? 'VERDER' : 'KLAAR', '#3bd16f') + '</div>';
       show(h);
       on('nx', function () { r.p++; prompt2(); });
     });
   }
 
 
-  // ---------- WHO POSTED THIS: optional round, posts only live in this phone's localStorage ----------
-  function savePosts() { try { localStorage.setItem('kabooze.posts', JSON.stringify(S.posts)); } catch (e) {} }
-  function postScreen(k, done) {
+  // ---------- WIE HEEFT DIT GEBIECHT + WIENS FOTO IS DIT: typed/taken in setup, only in this phone's localStorage ----------
+  var HINTS = ['IK HEB ...', 'IK HEB NOOIT TEGEN IEMAND GEZEGD DAT ...', 'MIJN GROOTSTE LEUGEN IS ...', 'IK BEN STIEKEM ...', 'IK SCHAAM ME NOG ALTIJD VOOR ...'];
+  var PHOTO_PROMPTS = ['JE SCHOENEN', 'IETS UIT JE ZAK OF HANDTAS', 'JE LAATSTE FOTO OP JE GSM, HOU HEM VOOR DE CAMERA', 'JE LELIJKSTE GEZICHT', 'JE HAND', 'IETS OP DE TAFEL DAT JOU VOORSTELT'];
+  function saveSecs() { try { localStorage.setItem('kabooze.secrets', JSON.stringify(S.secs)); } catch (e) {} }
+  function savePhotos() { try { localStorage.setItem('kabooze.photos', JSON.stringify(S.photos)); } catch (e) { /* quota: stay in memory only */ } }
+  function confessScreen(k, done) {
+    var hint = HINTS[(k + rnd(HINTS.length)) % HINTS.length];
     go(function () {
       S.holder = k;
-      show('<div class="scr"><div class="quote"><div class="aa y" style="font-size:12px">TYPE YOUR CRINGIEST OLD FACEBOOK POST. BE HONEST.</div></div><div class="sub">NOBODY SEES THIS UNTIL THE ROUND. SKIP IS ALLOWED.</div>' +
-        '<input type="text" id="post" maxlength="90" placeholder="YOUR POST" autocomplete="off" spellcheck="false" value="' + esc(S.draft) + '"><div class="grow"></div>' + btn('psk', 'SKIP', '#ff9f1c') + btn('pok', 'OK', '#3bd16f') + '</div>');
-      var t = $('#post'); t.addEventListener('input', function () { S.draft = t.value; });
+      showF('<div class="scr"><div class="quote"><div class="aa y" style="font-size:12px">BIECHT IETS DAT NIEMAND HIER WEET.</div></div><div class="sub">BV. ' + hint + '<br>NIEMAND ZIET WIE HET SCHREEF. OVERSLAAN MAG.</div>' +
+        '<input type="text" id="conf" maxlength="90" placeholder="' + esc(hint) + '" autocomplete="off" spellcheck="false" value="' + esc(S.draft) + '"><div class="grow"></div>' + btn('psk', 'OVERSLAAN', '#ff9f1c') + btn('pok', 'OK', '#3bd16f') + '</div>');
+      var t = $('#conf'); t.addEventListener('input', function () { S.draft = t.value; });
       on('psk', function () { S.draft = ''; done(); });
       on('pok', function () {
         var v = t.value.trim(); S.draft = '';
-        if (v) { S.posts.push({ by: k, text: v, used: false }); savePosts(); }
+        if (v) { S.secs.push({ by: k, text: v, used: false }); saveSecs(); }
         snd('ok'); done();
       });
     });
   }
-  function postCard(text) {
-    return '<div class="post"><div class="pbar">WALLBOOK 2009</div><div class="ph"><i class="pav"></i><div><b>???</b><span>MARCH 14 AT 02:13</span></div></div><div class="pt">' + esc(text) + '</div><div class="pf">LIKE - COMMENT - SHARE</div></div>';
+  function toJpeg(src) {
+    var c = document.createElement('canvas'); c.width = c.height = 320;
+    c.getContext('2d').drawImage(src, 0, 0, 320, 320);
+    return c.toDataURL('image/jpeg', 0.7);
   }
-  function startR3() {
-    var avail = S.posts.filter(function (p) { return !p.used; });
+  function fileToPhoto(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () {
+        var s2 = Math.min(im.width, im.height), c = document.createElement('canvas'); c.width = c.height = 320;
+        c.getContext('2d').drawImage(im, (im.width - s2) / 2, (im.height - s2) / 2, s2, s2, 0, 0, 320, 320);
+        URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', 0.7));
+      };
+      im.onerror = rej; im.src = url;
+    });
+  }
+  function photoScreen(k, done) {
+    var prompt = PHOTO_PROMPTS[rnd(PHOTO_PROMPTS.length)];
+    go(function () {
+      S.holder = k;
+      showF('<div class="scr"><div class="quote"><div class="qq">MAAK 1 FOTO IN HET GEHEIM</div><div class="aa y" style="font-size:13px">' + prompt + '</div></div><div class="sub">NIEMAND ZIET WIE HET IS. OVERSLAAN MAG.</div>' +
+        '<input type="file" id="pf" accept="image/*" capture="user" hidden><div class="grow"></div>' + btn('pks', 'OVERSLAAN', '#ff9f1c') + btn('pkc', 'FOTO MAKEN', '#3bd16f') + '</div>');
+      var f = $('#pf');
+      var opt = { photo: true, prompt: prompt, done: done, save: function (url) { S.photos.push({ by: k, img: url, prompt: prompt, used: false }); savePhotos(); } };
+      on('pks', done);
+      on('pkc', function () { if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) camScreen(k, opt); else f.click(); });
+      f.addEventListener('change', function () {
+        if (!f.files[0]) return;
+        fileToPhoto(f.files[0]).then(function (u) { opt.save(u); done(); }).catch(done);
+      });
+    });
+  }
+  // generic "pick the owner" round over a list of {by,...}
+  function nextOwner(R, kind, finish, nextFn) {
+    if (!R.left.length) return finish();
+    var k = -1, i;
+    for (i = 0; i < R.left.length; i++) if (R.left[i].by !== R.g) { k = i; break; }
+    if (k < 0) { var by = R.left[0].by; do { R.g = rnd(S.players.length); } while (R.g === by); k = 0; }
+    var a = R.left.splice(k, 1)[0], wrong = []; a.used = true;
+    pass(R.g, function () { guess(a, wrong, R, kind); });
+  }
+  function startConf() {
+    var avail = S.secs.filter(function (p) { return !p.used; });
     if (!avail.length) return runNext();
-    S.rn++;
-    S.r3 = { left: shuffle(avail), g: rnd(S.players.length), lockUntil: 0 };
-    nextPost();
+    S.rn++; S.r3 = { left: shuffle(avail), g: rnd(S.players.length), lockUntil: 0 }; nextConf();
   }
-  function nextPost() {
-    var r = S.r3;
-    if (!r.left.length) { S.posts = []; savePosts(); return runNext(); }
-    var k = -1;
-    for (var i = 0; i < r.left.length; i++) if (r.left[i].by !== r.g) { k = i; break; }
-    if (k < 0) {
-      var by = r.left[0].by;
-      do { r.g = rnd(S.players.length); } while (r.g === by);
-      k = 0;
-    }
-    var a = r.left.splice(k, 1)[0], wrong = []; a.used = true;
-    pass(r.g, function () { guess(a, wrong, r, 'post'); });
+  function nextConf() { nextOwner(S.r3, 'conf', function () { S.secs = []; saveSecs(); runNext(); }); }
+  function startPhoto() {
+    var avail = S.photos.filter(function (p) { return !p.used; });
+    if (!avail.length) return runNext();
+    S.rn++; S.r4 = { left: shuffle(avail), g: rnd(S.players.length), lockUntil: 0 }; nextPhoto();
   }
-
+  function nextPhoto() { nextOwner(S.r4, 'photo', function () { S.photos = []; savePhotos(); runNext(); }); }
+  function exposedPhoto(a, L) {
+    snd('drink'); drink(a.by, 2); L.g = a.by;
+    go(function () {
+      S.holder = a.by;
+      show('<div class="scr center"><div class="big r" style="font-size:18px">UITGEGEVEN!</div><canvas id="pimg" class="pimg" width="64" height="64"></canvas><img id="pcol" class="pimg col" alt="" hidden>' +
+        '<div class="big y" style="font-size:14px">' + esc(nm(a.by)) + ' DRINKT 2. SCHAAMTE.</div><div class="grow"></div><div id="rvw">' + btn('rv', 'TOON ORIGINEEL', '#ff9f1c') + '</div></div>');
+      drawDither($('#pimg'), a.img, 64);
+      on('rv', function () {
+        $('#pimg').hidden = true; var c = $('#pcol'); c.src = a.img; c.hidden = false;
+        $('#rvw').innerHTML = btn('nx', 'GA NAAR ' + esc(nm(a.by)), '#3bd16f');
+        on('nx', a.by >= 0 ? function () { nextPhoto(); } : null); autoFoc();
+      });
+    });
+  }
 
   // ---------- round rotation: random order, bomb ticks through all ----------
   var ROUNDS = {
-    who: { name: 'WHO SAID IT', rule: 'GUESS WHO PICKED WHO. WRONG GUESS = DRINK + 3 SECOND LOCK.', start: function () { startR1(); } },
-    likely: { name: 'MOST LIKELY TO', rule: 'VOTE IN SECRET. THE TABLE DECIDES.', start: function () { startR2(); } },
-    post: { name: 'WHO POSTED THIS', rule: 'GUESS WHO WROTE THE CRINGE POST.', start: function () { startR3(); } },
-    hot: { name: 'HOT POTATO', rule: 'SAY ONE OUT LOUD, PRESS A, PASS FAST. STUCK = DRINK.', start: function () { startHot(); } },
-    tot: { name: 'THIS OR THAT', rule: 'PICK IN SECRET. THE MINORITY DRINKS.', start: function () { startTot(); } },
-    never: { name: 'NEVER HAVE I EVER', rule: 'DID IT? DRINK. HOLDER PRESSES A FOR NEXT.', start: function () { startNever(); } }
+    who: { name: 'WIE ZEI DIT', rule: 'RAAD WIE WIE AANDUIDDE. FOUT = DRINKEN + 3 SECONDEN GEBLOKKEERD.', start: function () { startR1(); } },
+    likely: { name: 'WIE ZOU HET EERST', rule: 'STEM IN GEHEIM. DE TAFEL BESLIST.', start: function () { startR2(); } },
+    conf: { name: 'WIE HEEFT DIT GEBIECHT', rule: 'EEN GEHEIM OP HET SCHERM. DUID DE BIECHTER AAN. RAAK = HIJ DRINKT 2.', start: function () { startConf(); } },
+    photo: { name: 'WIENS FOTO IS DIT', rule: 'EEN FOTO IN GROENE PIXELS. WIE HEEFT ZE GENOMEN? RAAK = HIJ DRINKT 2.', start: function () { startPhoto(); } },
+    hot: { name: 'HETE PATAT', rule: 'ZEG ER EEN, TIK, GEEF DOOR. NIKS? DRINKEN.', start: function () { startHot(); } },
+    tot: { name: 'DIT OF DAT', rule: 'KIES IN GEHEIM. DE MINDERHEID DRINKT.', start: function () { startTot(); } },
+    never: { name: 'IK HEB NOG NOOIT', rule: 'GEDAAN? DRINK. DE HOUDER TIKT OP VERDER.', start: function () { startNever(); } }
   };
   function startCycle() {
     var q = ['who', 'likely', 'hot', 'tot', 'never'];
-    if (S.posts.some(function (p) { return !p.used; })) q.push('post');
+    if (S.secs.some(function (p) { return !p.used; })) q.push('conf');
+    if (S.photos.some(function (p) { return !p.used; })) q.push('photo');
     S.queue = shuffle(q);
     runNext();
   }
@@ -618,8 +688,8 @@
     go(function () {
       S.holder = h.g;
       showR('<div class="scr center"><div class="quote"><div class="aa y">' + esc(h.cats[h.c]) + '</div></div>' + av(h.g, 'lg') +
-        '<div class="big y" style="font-size:16px">' + esc(nm(h.g)) + ', GO!</div><div class="sub">SAY ONE OUT LOUD. PRESS A. PASS FAST.</div><div class="grow"></div>' +
-        btn('stk', 'STUCK, DRINK', '#ff9f1c') + btn('got', 'SAID ONE', '#3bd16f') + '</div>');
+        '<div class="big y" style="font-size:16px">' + esc(nm(h.g)) + ', GO!</div><div class="sub">ZEG ER EEN. TIK. GEEF DOOR.</div><div class="grow"></div>' +
+        btn('stk', 'NIKS? DRINK', '#ff9f1c') + btn('got', 'GEZEGD', '#3bd16f') + '</div>');
       on('got', function () { snd('ok'); h.g = (h.g + 1) % n; hotTurn(); });
       on('stk', function () { snd('bad'); drink(h.g, 1); hotStuck(); });
     });
@@ -628,7 +698,7 @@
     var h = S.hot, n = S.players.length, who = h.g;
     go(function () {
       S.holder = who;
-      show('<div class="scr center"><div class="grow"></div><div class="big r">NOTHING?</div>' + av(who, 'xl') + '<div class="big y" style="font-size:15px">' + esc(nm(who)) + ' DRINKS. SKILL ISSUE.</div><div class="grow"></div>' + btn('nx', 'NEXT', '#3bd16f') + '</div>');
+      show('<div class="scr center"><div class="grow"></div><div class="big r">NIKS?</div>' + av(who, 'xl') + '<div class="big y" style="font-size:15px">' + esc(nm(who)) + ' DRINKT. SKILL ISSUE.</div><div class="grow"></div>' + btn('nx', 'VERDER', '#3bd16f') + '</div>');
       on('nx', function () { h.c++; h.g = (who + 1) % n; hotTurn(); });
     });
   }
@@ -647,7 +717,7 @@
     if (k >= t.d.length) { t.votes[v] = ans; return totPlayer(v + 1); }
     go(function () {
       S.holder = v; var d = t.d[k];
-      showR('<div class="scr"><h2>THIS OR THAT?</h2><div class="grow"></div><div class="grid c2">' +
+      showF('<div class="scr"><h2>DIT OF DAT?</h2><div class="grow"></div><div class="grid c2">' +
         '<button class="pick" data-i="0" style="min-height:170px;font-size:11px;line-height:1.7;justify-content:center">' + esc(d.a) + '</button>' +
         '<button class="pick" data-i="1" style="min-height:170px;font-size:11px;line-height:1.7;justify-content:center">' + esc(d.b) + '</button></div>' +
         '<div class="sub">' + (k + 1) + ' OF ' + t.d.length + '. LEFT OR RIGHT, THEN A.</div><div class="grow"></div></div>');
@@ -660,16 +730,16 @@
     var d = t.d[k], side = [[], []], i;
     for (i = 0; i < n; i++) side[t.votes[i][k]].push(i);
     var a = side[0].length, b = side[1].length, msg, losers = [];
-    if (a === b) { msg = 'TIE. EVERYONE DRINKS.'; losers = side[0].concat(side[1]); }
-    else if (!a || !b) { msg = 'EVERYONE AGREES. NOBODY DRINKS.'; }
-    else { losers = a < b ? side[0] : side[1]; msg = 'MINORITY DRINKS.'; }
+    if (a === b) { msg = 'GELIJK. IEDEREEN DRINKT.'; losers = side[0].concat(side[1]); }
+    else if (!a || !b) { msg = 'IEDEREEN GELIJK. NIEMAND DRINKT.'; }
+    else { losers = a < b ? side[0] : side[1]; msg = 'DE MINDERHEID DRINKT.'; }
     losers.forEach(function (p) { drink(p, 1); });
     snd(losers.length ? 'drink' : 'ok');
     go(function () {
       var col = function (txt, who) {
         return '<div class="tcol"><div class="tt">' + esc(txt) + '</div><div class="big y">' + who.length + '</div><div class="tn">' + who.map(function (p) { return esc(nm(p)); }).join('<br>') + '</div></div>';
       };
-      show('<div class="scr"><div class="grid c2">' + col(d.a, side[0]) + col(d.b, side[1]) + '</div><div class="big y" style="font-size:14px;line-height:1.5">' + msg + '</div><div class="grow"></div>' + btn('nx', k < t.d.length - 1 ? 'NEXT' : 'DONE', '#3bd16f') + '</div>');
+      show('<div class="scr"><div class="grid c2">' + col(d.a, side[0]) + col(d.b, side[1]) + '</div><div class="big y" style="font-size:14px;line-height:1.5">' + msg + '</div><div class="grow"></div>' + btn('nx', k < t.d.length - 1 ? 'VERDER' : 'KLAAR', '#3bd16f') + '</div>');
       on('nx', function () { totReveal(k + 1); });
     });
   }
@@ -680,7 +750,7 @@
     var nv = S.nv;
     if (nv.i >= nv.l.length) return runNext();
     go(function () {
-      show('<div class="scr center"><div class="grow"></div><div class="quote"><div class="aa y">' + esc(nv.l[nv.i]) + '</div></div><div class="sub">IF YOU DID IT, DRINK.</div><div class="grow"></div>' + btn('nx', nv.i < nv.l.length - 1 ? 'NEXT' : 'DONE', '#3bd16f') + '</div>');
+      show('<div class="scr center"><div class="grow"></div><div class="quote"><div class="aa y">' + esc(nv.l[nv.i]) + '</div></div><div class="sub">GEDAAN? DRINK.</div><div class="grow"></div>' + btn('nx', nv.i < nv.l.length - 1 ? 'VERDER' : 'KLAAR', '#3bd16f') + '</div>');
       on('nx', function () { snd('ok'); nv.i++; neverShow(); });
     });
   }
@@ -688,19 +758,19 @@
   // ---------- loop / end ----------
   function loopScreen() {
     go(function () {
-      show('<div class="scr center"><div class="grow"></div><div class="big y">ANOTHER ROUND?</div><div class="sub">NEW QUESTIONS, SAME BOMB.</div><div class="grow"></div>' + btn('again', 'ANOTHER ROUND', '#3bd16f') + btn('end', 'FINISH', '#ff3b3b') + '</div>');
+      show('<div class="scr center"><div class="grow"></div><div class="big y">NOG EEN RONDE?</div><div class="sub">NIEUWE VRAGEN, DEZELFDE BOM.</div><div class="grow"></div>' + btn('again', 'NOG EEN RONDE', '#3bd16f') + btn('end', 'STOPPEN', '#ff3b3b') + '</div>');
       on('again', function () { secrets(0, []); });
       on('end', endScreen);
     });
   }
   function endScreen() {
-    stopGame(); S.posts = []; savePosts();
+    stopGame(); S.secs = []; S.photos = []; saveSecs(); savePhotos();
     go(function () {
       bar();
       var ord = S.players.map(function (p, i) { return i; }).sort(function (a, b) { return S.drinks[b] - S.drinks[a]; });
-      var h = '<div class="scr"><h2 class="r">GAME OVER</h2><div class="sub">SIPS TAKEN</div><div class="scroll"><div class="tally">';
+      var h = '<div class="scr"><h2 class="r">EINDE</h2><div class="sub">SLOKKEN</div><div class="scroll"><div class="tally">';
       ord.forEach(function (i) { h += '<div class="row">' + av(i, 'sm') + '<span class="nm">' + esc(nm(i)) + '</span><span class="y">' + S.drinks[i] + '</span></div>'; });
-      h += '</div></div>' + btn('pa', 'PLAY AGAIN', '#3bd16f') + '</div>';
+      h += '</div></div>' + btn('pa', 'NOG EENS', '#3bd16f') + '</div>';
       show(h);
       on('pa', startGame);
     });
