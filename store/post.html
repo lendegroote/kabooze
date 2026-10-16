@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8"><title>KABOOZE app store post</title>
+<style>
+@font-face{font-family:PS2P;src:url('../assets/fonts/pressstart2p.ttf')}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1350px;overflow:hidden;background:#070c07}
+body{position:relative;font-family:PS2P,monospace;color:#9cff57;text-transform:uppercase}
+.hex{position:absolute;top:0;font-size:15px;line-height:24px;color:#3a7a22;opacity:.22;white-space:pre;letter-spacing:1px}
+#hl{left:24px}#hr{right:24px;text-align:right}
+.glow{position:absolute;left:50%;top:640px;width:1000px;height:1000px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(111,209,58,.18),transparent 62%)}
+.logo{position:absolute;top:92px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:6px;font-size:112px;line-height:1}
+.logo span,.tag{color:transparent;background:radial-gradient(circle,var(--dc,#9cff57) 0 3.4px,transparent 4.6px) 0 0/9px 9px;-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 14px rgba(156,255,87,.6))}
+.logo span:nth-child(even){--dc:#6fd13a}
+.logo img{width:112px;height:112px;image-rendering:pixelated;filter:brightness(2.2) saturate(1.6) drop-shadow(0 0 14px rgba(156,255,87,.7));margin:0 4px}
+.sub{position:absolute;top:236px;left:0;right:0;text-align:center;font-size:23px;line-height:1.7;color:#6fd13a;text-shadow:0 0 10px rgba(156,255,87,.6);text-wrap:balance}
+.ph{position:absolute;width:var(--w);filter:drop-shadow(0 0 40px rgba(0,0,0,.8))}
+.ph img{width:100%;display:block}
+#p1{--w:350px;left:22px;top:560px}
+#p2{--w:440px;left:320px;top:360px}
+#p3{--w:350px;right:22px;top:560px}
+.fade{position:absolute;left:0;right:0;bottom:0;height:330px;background:linear-gradient(to bottom,transparent,#070c07 72%)}
+.foot{position:absolute;bottom:64px;left:0;right:0;text-align:center;font-size:25px;line-height:1.7;text-shadow:0 0 12px rgba(156,255,87,.7);text-wrap:balance}
+.scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.28) 0 2px,transparent 2px 5px)}
+</style></head><body>
+<div class="hex" id="hl"></div><div class="hex" id="hr"></div><div class="glow"></div>
+<div class="logo"><span>K</span><span>A</span><span>B</span><img src="../assets/sprites/bomb.svg"><span>O</span><span>Z</span><span>E</span></div>
+<div class="sub">Het drinkspel met een verborgen bom</div>
+<div class="ph" id="p1"><img src="c-s5-wheel.png"></div>
+<div class="ph" id="p3"><img src="c-s4-kaboom.png"></div>
+<div class="ph" id="p2"><img src="c-s3-guess.png"></div>
+<div class="fade"></div>
+<div class="foot">Hou de gsm niet vast<br>als hij kaboom gaat.</div>
+<div class="scan"></div>
+<script>
+fetch('hex.txt').then(r=>r.text()).then(t=>{const [a,b]=t.split('\n====\n');hl.textContent=a;hr.textContent=b})
+</script></body></html>

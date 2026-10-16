@@ -103,7 +103,7 @@
   }, 140);
 
   // ---------- fuse ----------
-  function resetFuse() { S.total = S.left = (90 + rnd(91)) * 1000; S.acc = 0; }
+  function resetFuse() { S.total = S.left = (S.fresh ? 180 : 30 + rnd(151)) * 1000; S.acc = 0; }   // first fuse of a game 3 min, then random 30-180 s (Len)
   var tmr = $('#tmr'), tg = tmr.getContext('2d'), tkey = '';
   function drawTimer() {
     var show = S.fuseOn && S.cur !== title;
@@ -165,8 +165,12 @@
     for (var i = 0; i < ROULETTE.length; i++) { acc += ROULETTE[i].wt; if (x < acc) return { i: i, mid: (acc - ROULETTE[i].wt + (x - (acc - ROULETTE[i].wt))) / WT * 360 }; }
   }
   function resultText(r, who) {
-    if (r.k === 'truth') return TRUTHS[rnd(TRUTHS.length)];
-    if (r.k === 'dare') return DARES[rnd(DARES.length)];
+    if (r.k === 'truth' || r.k === 'dare') {
+      var pool = r.k === 'truth' ? TRUTHS : DARES, used = S.usedTD = S.usedTD || [];
+      var fresh = pool.filter(function (x) { return used.indexOf(x) < 0; });
+      if (!fresh.length) { used = S.usedTD = used.filter(function (x) { return pool.indexOf(x) < 0; }); fresh = pool; }
+      var pick = fresh[rnd(fresh.length)]; used.push(pick); return pick;
+    }
     if (r.k === 'confess') {
       var a = S.ans.filter(function (x) { return x.by === who; })[0];
       return a ? 'VERTEL DE TAFEL WIE JE AANDUIDDE BIJ "' + a.q + '"' : 'VERTEL DE TAFEL EEN GEHEIM.';
@@ -195,7 +199,7 @@
         if (r.k === 'drink') drink(who, r.c);
         if (r.k === 'double') S.dbl.push({ p: who, rn: S.rn + 1 });
         res.innerHTML = '<div class="big y" style="margin-bottom:10px">' + r.n + '</div><div class="sub" style="margin-bottom:10px">' + esc(resultText(r, who)) + '</div>' + btn('cont', 'VERDER', '#3bd16f');
-        on('cont', function () { S.modal = false; MUS.hold = false; MUS.mul = 1; MUS.start(); resetFuse(); S.cur(); });
+        on('cont', function () { S.modal = false; MUS.hold = false; MUS.mul = 1; MUS.start(); resetFuse(); runNext(); });
       }, 4400);
     }
     on('spin', spin); c.addEventListener('click', spin); card.querySelector('.scr').addEventListener('click', spin);
@@ -449,11 +453,34 @@
   }
 
   // ---------- game start ----------
-  function stopGame() { S.fuseOn = false; S.inGame = false; S.modal = false; $('#tb').classList.remove('hot'); }
+  // ---------- wake lock + resume ----------
+  var GKEY = 'kabooze.game', wl = null;
+  function wakeOn() {
+    try { if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (l) { wl = l; l.addEventListener('release', function () { if (wl === l) wl = null; }); }).catch(function () {}); } catch (e) {}
+  }
+  function wakeOff() { try { if (wl) wl.release(); } catch (e) {} wl = null; }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && S.inGame && !wl) wakeOn(); });
+  window.addEventListener('beforeunload', function (e) { if (S.inGame) { e.preventDefault(); e.returnValue = ''; return ''; } });
+  function saveGame(queue) {
+    try {
+      localStorage.setItem(GKEY, JSON.stringify({ drinks: S.drinks, usedQ: S.usedQ, rn: S.rn, ans: S.ans, queue: queue, left: S.left, total: S.total, fuseOn: S.fuseOn, fresh: S.fresh, dbl: S.dbl }));
+      saveSecs(); savePhotos();
+    } catch (e) {}
+  }
+  function clearGame() { try { localStorage.removeItem(GKEY); } catch (e) {} }
+  function resumeGame() {
+    var g; try { g = JSON.parse(localStorage.getItem(GKEY)); } catch (e) {}
+    if (!g || !g.queue || !g.queue.length || S.players.some(function (p) { return !p.name; })) return false;
+    try { S.secs = JSON.parse(localStorage.getItem('kabooze.secrets')) || []; S.photos = JSON.parse(localStorage.getItem('kabooze.photos')) || []; } catch (e) {}
+    S.drinks = g.drinks || []; S.usedQ = g.usedQ || []; S.rn = g.rn || 0; S.ans = g.ans || []; S.queue = g.queue;
+    S.left = g.left; S.total = g.total; S.fresh = !!g.fresh; S.dbl = g.dbl || []; S.fuseOn = false; S.inGame = true; S.modal = false;
+    wakeOn(); runNext(); return true;
+  }
+  function stopGame() { clearGame(); wakeOff(); S.fuseOn = false; S.inGame = false; S.modal = false; $('#tb').classList.remove('hot'); }
   function startGame() {
     S.drinks = S.players.map(function () { return 0; });
-    S.usedQ = []; S.dbl = []; S.rn = 0; S.secs = []; S.photos = []; S.askSec = true; S.inGame = true;
-    S.fuseOn = false; S.fresh = true; S.modal = false;
+    S.usedQ = []; S.usedTD = []; S.dbl = []; S.rn = 0; S.secs = []; S.photos = []; S.askSec = true; S.inGame = true;
+    S.fuseOn = false; S.fresh = true; S.modal = false; wakeOn();
     secrets(0, []);
   }
   function pass(i, next) {
@@ -500,7 +527,7 @@
   // ---------- round 1: who said it ----------
   function startR1() {
     S.rn++;
-    S.r1 = { lockUntil: 0, left: shuffle(S.ans), g: rnd(S.players.length) };
+    S.r1 = { lockUntil: 0, left: shuffle(S.ans.filter(function (x) { return !x.solved; })), g: rnd(S.players.length) };
     nextSecret();
   }
   function nextSecret() {
@@ -546,6 +573,7 @@
       bindPicks(function (i, b) {
         if (L.lockUntil > Date.now()) return;
         if (i === a.by) {
+          if (kind === 'q') a.solved = true; else { a.used = true; if (kind === 'conf') saveSecs(); else savePhotos(); }
           if (kind === 'photo') return exposedPhoto(a, L);
           return kind === 'conf' ? exposed(a, L, 2, 'HEEFT DIT GEBIECHT. DRINK 2.', nextConf) : exposed(a, L, 1, 'HEEFT HET GEZEGD. DRINK, KLIKSPAAN.', nextSecret);
         }
@@ -665,7 +693,7 @@
     var k = -1, i;
     for (i = 0; i < R.left.length; i++) if (R.left[i].by !== R.g) { k = i; break; }
     if (k < 0) { var by = R.left[0].by; do { R.g = rnd(S.players.length); } while (R.g === by); k = 0; }
-    var a = R.left.splice(k, 1)[0], wrong = []; a.used = true;
+    var a = R.left.splice(k, 1)[0], wrong = [];
     pass(R.g, function () { guess(a, wrong, R, kind); });
   }
   function startConf() {
@@ -673,13 +701,13 @@
     if (!avail.length) return runNext();
     S.rn++; S.r3 = { left: shuffle(avail), g: rnd(S.players.length), lockUntil: 0 }; nextConf();
   }
-  function nextConf() { nextOwner(S.r3, 'conf', function () { S.secs = []; saveSecs(); runNext(); }); }
+  function nextConf() { nextOwner(S.r3, 'conf', function () { runNext(); }); }
   function startPhoto() {
     var avail = S.photos.filter(function (p) { return !p.used; });
     if (!avail.length) return runNext();
     S.rn++; S.r4 = { left: shuffle(avail), g: rnd(S.players.length), lockUntil: 0 }; nextPhoto();
   }
-  function nextPhoto() { nextOwner(S.r4, 'photo', function () { S.photos = []; savePhotos(); runNext(); }); }
+  function nextPhoto() { nextOwner(S.r4, 'photo', function () { runNext(); }); }
   function exposedPhoto(a, L) {
     snd('drink'); drink(a.by, 2); L.g = a.by;
     go(function () {
@@ -705,18 +733,32 @@
     tot: { name: 'DIT OF DAT', rule: 'KIES IN GEHEIM. DE MINDERHEID DRINKT.', start: function () { startTot(); } },
     never: { name: 'IK HEB NOG NOOIT', rule: 'GEDAAN? DRINK. DE HOUDER TIKT OP VERDER.', start: function () { startNever(); } }
   };
-  function startCycle() {
-    var q = ['who', 'likely', 'hot', 'tot', 'never'];
-    if (S.secs.some(function (p) { return !p.used; })) q.push('conf');
-    if (S.photos.some(function (p) { return !p.used; })) q.push('photo');
-    S.queue = shuffle(q);
-    runNext();
+  function pending() {
+    return { who: S.ans.filter(function (x) { return !x.solved; }).length, conf: S.secs.filter(function (p) { return !p.used; }).length, photo: S.photos.filter(function (p) { return !p.used; }).length };
   }
+  function startCycle() { S.queue = []; runNext(); }
   function runNext() {
-    if (!S.queue || !S.queue.length) return loopScreen();
+    var P = pending();
+    if (!P.who && !P.conf && !P.photo) return endScreen();
+    var tries = 0;
+    for (;;) {
+      if (!S.queue || !S.queue.length) {
+        var q = shuffle(['likely', 'hot', 'tot', 'never']).slice(0, 2);
+        ['who', 'conf', 'photo'].forEach(function (k) { if (P[k]) q.push(k); });
+        S.queue = shuffle(q);
+      }
+      if (S.queue[0] in P && !P[S.queue[0]]) { S.queue.shift(); if (++tries > 20) return endScreen(); continue; }
+      break;
+    }
+    saveGame(S.queue.slice());
     var R = ROUNDS[S.queue.shift()];
+    var prog = [];
+    if (P.who) prog.push('NOG ' + P.who + ' ANTWOORDEN TE ONTMASKEREN');
+    if (P.conf) prog.push('NOG ' + P.conf + ' GEHEIMEN TE ONTMASKEREN');
+    if (P.photo) prog.push('NOG ' + P.photo + ' FOTO\'S TE ONTMASKEREN');
     go(function () {
-      show('<div class="scr center"><div class="grow"></div><div class="big y" style="font-size:20px">' + R.name + '</div><div class="sub">' + R.rule + '</div><div class="grow"></div>' + btn('go', 'GO', '#3bd16f') + '</div>');
+      show('<div class="scr center"><div class="grow"></div><div class="big y" style="font-size:20px">' + R.name + '</div><div class="sub">' + R.rule + '</div><div class="sub y">' + prog.join('<br>') + '</div><div class="grow"></div>' + btn('go', 'GO', '#3bd16f') + '</div>');
+      S.frozen = true;
       on('go', function () {
         snd('go');
         if (!S.fuseOn) { if (S.fresh) { resetFuse(); S.fresh = false; } S.fuseOn = true; S.modal = false; }   // fuse starts when the first round begins
@@ -805,6 +847,7 @@
 
   // ---------- loop / end ----------
   function loopScreen() {
+    clearGame();
     go(function () {
       show('<div class="scr center"><div class="grow"></div><div class="big y">NOG EEN RONDE?</div><div class="sub">NIEUWE VRAGEN, DEZELFDE BOM.</div><div class="grow"></div>' + btn('again', 'NOG EEN RONDE', '#3bd16f') + btn('end', 'STOPPEN', '#ff3b3b') + '</div>');
       on('again', function () { secrets(0, []); });
@@ -834,5 +877,5 @@
     $('#hexl').textContent = out + out; $('#hexr').textContent = out.split('').reverse().join('') + out;
   })();
   window.KABOOZE = { S: S, roulette: roulette, pickSlice: pickSlice, runNext: runNext };
-  title();
+  if (!resumeGame()) title();
 })();

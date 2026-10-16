@@ -175,8 +175,11 @@ button, .pick, .btn, input, select { touch-action: manipulation; }
 /* pass screen: full-screen takeover */
 .av.huge { width: min(62vw, 240px); height: min(62vw, 240px); animation: pulse 0.8s steps(2) infinite; }
 .scr.pass { width: 100%; }
-.scr.pass .big { font-size: 22px; animation: pulse 0.8s steps(2) infinite; }
-.scr.pass .big.y { font-size: 30px; }
+.scr.pass .big { font-size: 19px; animation: pulse 0.8s steps(2) infinite; }
+.scr.pass .big.y { font-size: 26px; }
 body.passing #back, body.passing #fs, body.passing #menu { visibility: hidden !important; }
 body.passing #screen { animation: passflash .25s steps(2) 5; }
 @keyframes passflash { 50% { filter: invert(1); } }
+
+/* long names / questions: wrap instead of cutting off */
+.big, .sub, .aa, .qq, .row .nm, .pick span { overflow-wrap: anywhere; max-width: 100%; }

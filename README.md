@@ -12,12 +12,12 @@ Water telt mee. Ken je limiet.
 2. SPELERS: naam + selfie (camera met live groene dither, of fotokiezer als de camera niet lukt).
 3. GEHEIMEN (per speler, in het geheim, de gsm gaat rond): duid iemand aan bij een vraag, biecht 1 ding (overslaan mag) en neem 1 foto met een willekeurige opdracht (overslaan mag). Geheimen en foto's blijven alleen in de localStorage van dit toestel.
 4. RONDES in willekeurige volgorde, elk ongeveer 5 beurten: WIE ZEI DIT, WIE ZOU HET EERST, HETE PATAT, DIT OF DAT, IK HEB NOG NOOIT, WIE HEEFT DIT GEBIECHT, WIENS FOTO IS DIT. Fout raden = 1 drinken + 3 seconden geblokkeerd, juist raden = die persoon drinkt 2 (of 1) en krijgt de gsm.
-5. DE BOM: 1 verborgen lont (90 tot 180 s), met een mm:ss-aftelling bovenaan (rood en knipperend in de laatste 10 s). De lont staat stil terwijl iemand typt, foto's neemt of in het geheim stemt, en loopt bij het doorgeven en raden. Bij KABOOM draait de houder van de gsm aan het ROULETTE-wiel (alleen voor jezelf, 4% kans op TRAKTEER EEN RONDE).
+5. DE BOM: 1 verborgen lont (30 tot 120 s), met een mm:ss-aftelling bovenaan (rood en knipperend in de laatste 10 s). De lont staat stil terwijl iemand typt, foto's neemt of in het geheim stemt, en loopt bij het doorgeven en raden. Bij KABOOM draait de houder van de gsm aan het ROULETTE-wiel (alleen voor jezelf, 4% kans op TRAKTEER EEN RONDE).
 6. Na alle rondes: nog een ronde of stoppen (tabel met slokken).
 
 ## Bediening
 
-Alles is aanraken. Op laptop mag het toetsenbord: pijltjes + X (bevestigen), Z (terug), Enter (menu), Shift (geluid). Het menu (bovenaan) heeft DOORGAAN, OPNIEUW BEGINNEN, TERUG NAAR START, GELUID, MUZIEK, INHOUD en VOLLEDIG SCHERM (op iPhone: zet de pagina op je startscherm, dan start hij volledig scherm via manifest.json).
+Alles is aanraken. Op laptop mag het toetsenbord: pijltjes + X (bevestigen), Z (terug), Enter (menu), Shift (geluid). Het menu (bovenaan) heeft DOORGAAN, SPEL HERSTARTEN, OPNIEUW BEGINNEN (wist spelers, antwoorden en foto's na bevestiging; staat ook op het titelscherm), TERUG NAAR START, GELUID, MUZIEK, INHOUD en VOLLEDIG SCHERM (op iPhone: zet de pagina op je startscherm, dan start hij volledig scherm via manifest.json).
 
 ## Inhoud
 
@@ -44,4 +44,4 @@ content.html, js/content.js    inhoudslijst met zoeken en verwijderen
 manifest.json, assets/         web app manifest, icoontjes, lettertype
 ```
 
-js/main.js, js/game.js en data/questions.js zijn restanten van de oude Snake-versie en worden niet gebruikt.
+Het scherm blijft altijd staand (ook als je de gsm kantelt), het scherm gaat niet in slaapstand tijdens een spel, en bij een herlaad pak je de lopende ronde weer op.
