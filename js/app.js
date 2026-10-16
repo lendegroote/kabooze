@@ -49,6 +49,13 @@
   }
   function av(i, cls) { return '<img class="av ' + (cls || 'md') + '" src="' + avSrc(i) + '" alt="">'; }
   function btn(id, label, c, extra) { return '<button class="btn ' + (extra || '') + '" id="' + id + '" style="--c:' + c + '">' + label + '</button>'; }
+  // fires on pointerdown so a closing phone keyboard (layout shift) cannot swallow the tap; click stays as fallback for D-pad/keyboard
+  function onNow(id, fn) {
+    var e = document.getElementById(id), t = 0; if (!e) return;
+    function h(ev) { if (ev.type === 'click' && Date.now() - t < 700) return; t = Date.now(); fn(); }
+    e.addEventListener('pointerdown', function (ev) { ev.preventDefault(); h(ev); });
+    e.addEventListener('click', h);
+  }
   function on(id, fn) { var e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
   function pickGrid(idx, cb, cls) {
     var h = '<div class="grid ' + (idx.length > 4 ? 'c3' : 'c2') + '">';
@@ -396,8 +403,9 @@
     stopCam();
     facing = facing || (opt ? 'environment' : 'user');
     var N = opt ? 64 : 32;
-    showF('<div class="scr"><h2>' + (opt ? esc(opt.prompt) : 'LACH, ' + esc(nm(i))) + '</h2><div class="grow camwrap"><canvas id="cv" width="' + N + '" height="' + N + '"></canvas></div><div class="toast" id="toast">CAMERA STARTEN...</div><div id="cbtns" style="width:100%"></div></div>');
+    showF('<div class="scr"><h2>' + (opt ? esc(opt.prompt) : 'LACH, ' + esc(nm(i))) + '</h2>' + (opt ? btn('cks', 'OVERSLAAN', '#ff9f1c', 'sm') : '') + '<div class="grow camwrap"><canvas id="cv" width="' + N + '" height="' + N + '"></canvas></div><div class="toast" id="toast">CAMERA STARTEN...</div><div id="cbtns" style="width:100%"></div></div>');
     var cam = S.cam = { stream: null, iv: 0, back: opt ? opt.done : null };
+    if (opt) onNow('cks', function () { stopCam(); opt.done(); });
     function camStart(fm) {
     facing = fm;
     clearInterval(cam.iv); if (cam.stream) cam.stream.getTracks().forEach(function (t) { t.stop(); }); cam.stream = null;
@@ -597,13 +605,13 @@
     go(function () {
       S.holder = k;
       showF('<div class="scr"><div class="quote"><div class="aa y" style="font-size:12px">BIECHT IETS DAT NIEMAND HIER WEET.</div></div><div class="sub">BV. ' + hint + '<br>NIEMAND ZIET WIE HET SCHREEF. OVERSLAAN MAG.</div>' +
-        '<input type="text" id="conf" maxlength="90" placeholder="' + esc(hint) + '" autocomplete="off" spellcheck="false" value="' + esc(S.draft) + '"><div class="grow"></div>' + btn('psk', 'OVERSLAAN', '#ff9f1c') + btn('pok', 'OK', '#3bd16f') + '</div>');
+        '<input type="text" id="conf" maxlength="90" placeholder="' + esc(hint) + '" autocomplete="off" spellcheck="false" value="' + esc(S.draft) + '">' + btn('pok', 'OK', '#3bd16f') + btn('psk', 'OVERSLAAN', '#ff9f1c') + '</div>');
       var t = $('#conf'); t.addEventListener('input', function () { S.draft = t.value; });
-      on('psk', function () { S.draft = ''; done(); });
-      on('pok', function () {
+      onNow('psk', function () { S.draft = ''; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); done(); });
+      onNow('pok', function () {
         var v = t.value.trim(); S.draft = '';
         if (v) { S.secs.push({ by: k, text: v, used: false }); saveSecs(); }
-        snd('ok'); done();
+        snd('ok'); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); done();
       });
     });
   }
@@ -628,10 +636,10 @@
     go(function () {
       S.holder = k;
       showF('<div class="scr"><div class="quote"><div class="qq">MAAK 1 FOTO IN HET GEHEIM</div><div class="aa y" style="font-size:13px">' + prompt + '</div></div><div class="sub">NIEMAND ZIET WIE HET IS. OVERSLAAN MAG.</div>' +
-        '<input type="file" id="pf" accept="image/*" capture="user" hidden><div class="grow"></div>' + btn('pks', 'OVERSLAAN', '#ff9f1c') + btn('pkc', 'FOTO MAKEN', '#3bd16f') + '</div>');
+        '<input type="file" id="pf" accept="image/*" capture="user" hidden>' + btn('pkc', 'FOTO MAKEN', '#3bd16f') + btn('pks', 'OVERSLAAN', '#ff9f1c') + '</div>');
       var f = $('#pf');
       var opt = { photo: true, prompt: prompt, done: done, save: function (url) { S.photos.push({ by: k, img: url, prompt: prompt, used: false }); savePhotos(); } };
-      on('pks', done);
+      onNow('pks', done);
       on('pkc', function () { if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) camScreen(k, opt); else f.click(); });
       f.addEventListener('change', function () {
         if (!f.files[0]) return;
