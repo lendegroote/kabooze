@@ -581,6 +581,16 @@
   "d": "JIJ TRAKTEERT DE HELE TAFEL. RESPECT."
  },
  {
+  "id": "rl-010",
+  "type": "roulette",
+  "w": "DRINK 1",
+  "n": "DRINK 1",
+  "k": "drink",
+  "c": 1,
+  "wt": 8,
+  "d": "EEN SLOKJE. PROPER."
+ },
+ {
   "id": "cat-001",
   "type": "category",
   "text": "BELGISCHE BIEREN"

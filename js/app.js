@@ -166,7 +166,7 @@
   }
   function riggedSlice(name) {
     var n = String(name || '').trim().toLowerCase();
-    if (n === 'len' || n === 'remi') return 'safe';
+    if (n === 'len' || n === 'remi' || n === 'reni') return 'rl-010';   // never a round, only one sip
     if (n === 'laurens') { var f = S.firstSpin = S.firstSpin || {}; if (!f[n]) { f[n] = 1; return 'buy'; } }
     if (armed()) { armed(false); return 'buy'; }
     return null;
@@ -174,7 +174,7 @@
   function pickSlice(name) {
     var WT = getWT(), want = riggedSlice(name), x = Math.random() * WT, acc = 0, i;
     if (want) {
-      for (i = 0, acc = 0; i < ROULETTE.length; i++) { if (ROULETTE[i].k === want) { x = acc + Math.random() * ROULETTE[i].wt; break; } acc += ROULETTE[i].wt; }
+      for (i = 0, acc = 0; i < ROULETTE.length; i++) { if (ROULETTE[i].k === want || ROULETTE[i].id === want) { x = acc + Math.random() * ROULETTE[i].wt; break; } acc += ROULETTE[i].wt; }
       acc = 0;
     }
     for (i = 0; i < ROULETTE.length; i++) { acc += ROULETTE[i].wt; if (x < acc) return { i: i, mid: x / WT * 360 }; }
