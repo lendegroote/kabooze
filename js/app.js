@@ -91,16 +91,18 @@
   var last = performance.now();
   setInterval(function () {
     var now = performance.now(), dt = now - last; last = now;
+    if (!S.fuseOn) MUS.mul = 1;
     if (!S.fuseOn || S.paused || S.modal) return;
     S.left -= dt; S.acc += dt;
-    var p = 1 - Math.max(S.left, 0) / S.total, iv = 1000 * Math.pow(0.12, Math.pow(p, 1.7));
+    var p = 1 - Math.max(S.left, 0) / S.total; MUS.mul = 1 + 0.25 * p;
+    var iv = 1000 * Math.pow(0.12, Math.pow(p, 1.7));
     if (S.acc >= iv) { S.acc = 0; if (S.snd) try { beep(900 + p * 900, 0.04, 0, 0.09); } catch (e) {} }
     $('#tb').classList.toggle('hot', S.left < 10000);
     if (S.left <= 0) explode();
   }, 40);
 
   function explode() {
-    S.modal = true;
+    S.modal = true; MUS.hold = true; MUS.stop();
     var who = S.holder;
     snd('boom');
     try { navigator.vibrate && navigator.vibrate([200, 80, 200, 80, 500]); } catch (e) {}
@@ -144,7 +146,7 @@
   }
   function roulette(who) {
     over.hidden = true; over.className = ''; over.onclick = null;
-    S.modal = true;
+    S.modal = true; snd('fanfare');
     show('<div class="scr center"><h2>' + esc(nm(who)) + ' SPINS!</h2><div class="wheelwrap"><div class="ptr"></div></div><div id="res" style="width:100%"></div></div>');
     var w = card.querySelector('.wheelwrap'), c = wheelCanvas();
     w.appendChild(c);
@@ -164,7 +166,7 @@
         if (r.k === 'drink') drink(who, r.c);
         if (r.k === 'double') S.dbl.push({ p: who, rn: S.rn + 1 });
         res.innerHTML = '<div class="big y" style="margin-bottom:10px">' + r.n + '</div><div class="sub" style="margin-bottom:10px">' + esc(resultText(r, who)) + '</div>' + btn('cont', 'CONTINUE', '#3bd16f');
-        on('cont', function () { S.modal = false; resetFuse(); S.cur(); });
+        on('cont', function () { S.modal = false; MUS.hold = false; MUS.mul = 1; MUS.start(); resetFuse(); S.cur(); });
       }, 4400);
     }
     on('spin', spin); c.addEventListener('click', spin);
@@ -186,12 +188,17 @@
     function close() { over.hidden = true; over.className = ''; S.paused = was; }
     over.hidden = false; over.className = '';
     over.innerHTML = '<div class="box"><h2>PAUSED</h2>' + btn('m1', 'RESUME', '#3bd16f') +
-      (S.inGame ? btn('m2', 'RESTART', '#ff9f1c') : '') + btn('m3', 'EDIT PLAYERS', '#3ec6ff') +
-      btn('m4', 'SOUND: ' + (S.snd ? 'ON' : 'OFF'), '#ffd23f') + '</div>';
+      (S.inGame ? btn('m2', 'RESTART', '#ff9f1c') : '') + btn('m3', 'GO BACK TO START', '#3ec6ff') +
+      btn('m4', 'SFX: ' + (S.snd ? 'ON' : 'OFF'), '#ffd23f') + btn('m5', 'MUSIC: ' + (MUS.on ? 'ON' : 'OFF'), '#ffd23f') + '</div>';
     on('m1', close);
     on('m2', function () { close(); stopGame(); startGame(); });
-    on('m3', function () { close(); stopGame(); go(setup); });
-    on('m4', function () { S.snd = !S.snd; $('#m4').textContent = 'SOUND: ' + (S.snd ? 'ON' : 'OFF'); });
+    on('m3', function () {
+      close();
+      if (!S.inGame) return go(title);
+      confirmBox('SURE? GAME IS LOST', function () { stopGame(); go(title); });
+    });
+    on('m4', function () { S.snd = !S.snd; $('#m4').textContent = 'SFX: ' + (S.snd ? 'ON' : 'OFF'); });
+    on('m5', function () { MUS.on = !MUS.on; if (MUS.on) MUS.start(); else MUS.stop(); $('#m5').textContent = 'MUSIC: ' + (MUS.on ? 'ON' : 'OFF'); });
   });
   function confirmBox(msg, yes) {
     over.hidden = false; over.className = '';
@@ -199,7 +206,8 @@
     on('cy', function () { over.hidden = true; yes(); });
     on('cn', function () { over.hidden = true; });
   }
-  document.addEventListener('pointerdown', function () { unlock(); }, { once: true });
+  document.addEventListener('pointerdown', function () { unlock(); MUS.start(); }, { once: true });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) MUS.stop(); else MUS.start(); });
 
 
   // ---------- Game Boy controls: D-pad moves a highlight, A confirm, B back, START menu, SELECT sound ----------
@@ -235,7 +243,7 @@
     if (best) { setFoc(best); snd('move'); }
   }
   function press(k) {
-    unlock();
+    unlock(); MUS.start();
     if (k === 'up' || k === 'down' || k === 'left' || k === 'right') return nav(k);
     if (k === 'a') { var f = curFoc(); if (!f) return autoFoc(); if (f.tagName === 'INPUT') f.focus(); else f.click(); return; }
     if (k === 'b') {
@@ -243,7 +251,7 @@
       return $('#back').click();
     }
     if (k === 'start') { var m = over.querySelector('#m1'); return m ? m.click() : (over.hidden && $('#menu').click()); }
-    if (k === 'select') { S.snd = !S.snd; var m4 = $('#m4'); if (m4) m4.textContent = 'SOUND: ' + (S.snd ? 'ON' : 'OFF'); snd('ok'); }
+    if (k === 'select') { S.snd = !S.snd; var m4 = $('#m4'); if (m4) m4.textContent = 'SFX: ' + (S.snd ? 'ON' : 'OFF'); snd('ok'); }
   }
   document.querySelectorAll('#ctl [data-k]').forEach(function (b) {
     b.addEventListener('pointerdown', function (e) { e.preventDefault(); b.classList.add('dn'); press(b.dataset.k); });
@@ -402,7 +410,7 @@
   // ---------- round 1: who said it ----------
   function startR1() {
     S.rn++;
-    S.r1 = { left: shuffle(S.ans), g: rnd(S.players.length) };
+    S.r1 = { lockUntil: 0, left: shuffle(S.ans), g: rnd(S.players.length) };
     nextSecret();
   }
   function nextSecret() {
@@ -423,12 +431,24 @@
     go(function () {
       S.holder = g;
       show('<div class="scr"><div class="quote"><div class="qq">' + esc(a.q) + '</div><div class="aa y">&gt; ' + esc(nm(a.pick)) + '</div></div>' +
-        '<h2>WHO SAID IT?</h2><div class="scroll">' + pickGrid(all, null, function (i) { return wrong.indexOf(i) >= 0 ? 'bad' : ''; }) + '</div><div class="toast" id="toast"></div></div>');
+        '<h2>WHO SAID IT?</h2><div class="scroll">' + pickGrid(all, null, function (i) { return wrong.indexOf(i) >= 0 ? 'bad' : ''; }) + '</div><div class="cd big" id="cd"></div><div class="toast" id="toast"></div></div>');
+      var tok = S.lockTok = {};
+      function tick() {
+        var grid = card.querySelector('.grid'), cd = $('#cd');
+        if (S.lockTok !== tok || !grid || !cd) return;
+        var left = S.r1.lockUntil - Date.now();
+        if (left > 0) { grid.classList.add('lock'); cd.textContent = Math.ceil(left / 1000); setTimeout(tick, 100); }
+        else { grid.classList.remove('lock'); cd.textContent = ''; $('#toast').textContent = ''; }
+      }
+      if (S.r1.lockUntil > Date.now()) { $('#toast').textContent = 'NOPE. YOU KNOW NOBODY. ' + nm(g) + ' DRINK.'; tick(); }
       bindPicks(function (i, b) {
+        if (S.r1.lockUntil > Date.now()) return;
         if (i === a.by) return exposed(a);
         wrong.push(i); drink(g, 1); snd('bad');
         b.classList.add('shake', 'bad');
+        S.r1.lockUntil = Date.now() + 3000;
         $('#toast').textContent = 'NOPE. YOU KNOW NOBODY. ' + nm(g) + ' DRINK.';
+        tick();
       });
     });
   }
@@ -502,6 +522,15 @@
     });
   }
 
+  (function () {
+    var w = ['BOOT', 'LOAD', 'BOMB.SYS', 'FUSE', 'OK', 'READY', 'PLAYER', 'DRINK', 'TICK', 'SYNC'], out = '', i, j, l;
+    for (i = 0; i < 90; i++) {
+      l = '0x' + (4096 + i * 16).toString(16).toUpperCase();
+      for (j = 0; j < 3; j++) l += ' ' + ('0' + rnd(256).toString(16)).slice(-2).toUpperCase();
+      out += (i % 5 === 0 ? '> ' + w[rnd(w.length)] + '\n' : l + '\n');
+    }
+    $('#hexl').textContent = out + out; $('#hexr').textContent = out.split('').reverse().join('') + out;
+  })();
   window.KABOOZE = { S: S, roulette: roulette, pickSlice: pickSlice };
   title();
 })();

@@ -1,7 +1,7 @@
 @font-face { font-family: 'PS2P'; src: url('assets/fonts/pressstart2p.ttf') format('truetype'); font-display: swap; }
 :root { --bg: #0b140b; --g: #9cff57; --g2: #6fd13a; --dim: #3a7a22; --pan: #12260f; --glow: 0 0 6px rgba(156,255,87,.75); }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #17171c; touch-action: manipulation; overscroll-behavior: none; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #070c07; touch-action: manipulation; overscroll-behavior: none; }
 body { font-family: 'PS2P', monospace; color: var(--g); font-size: 12px; line-height: 1.5; text-transform: uppercase; -webkit-user-select: none; user-select: none; }
 
 /* ---------- Game Boy body ---------- */
@@ -133,3 +133,25 @@ input::placeholder { color: var(--dim); }
 .camwrap { display: flex; align-items: center; justify-content: center; width: 100%; }
 .camwrap { min-height: 0; padding: 6px; }
 .camwrap canvas { height: 100%; width: auto; max-width: 100%; max-height: 300px; aspect-ratio: 1; image-rendering: pixelated; box-shadow: 0 0 0 3px var(--g2), 0 0 14px rgba(156,255,87,.4); }
+
+.cd { min-height: 34px; font-size: 30px; --dc: #ff6a2a; }
+.lock .pick { opacity: .3; pointer-events: none; }
+
+/* ---------- retro-tech desk behind the Game Boy ---------- */
+html { background-color: #070c07; background-image: radial-gradient(circle at 1px 1px, rgba(111,209,58,.22) 1.5px, transparent 2px), linear-gradient(rgba(111,209,58,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(111,209,58,.07) 1px, transparent 1px); background-size: 48px 48px, 24px 24px, 24px 24px; }
+body { background: transparent; }
+#gb { position: relative; z-index: 2; }
+#desk { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; display: none; }
+@media (min-width: 760px) {
+  #desk { display: block; }
+  .hex { position: absolute; top: 0; width: 150px; font-size: 8px; line-height: 14px; color: rgba(111,209,58,.22); white-space: pre; text-transform: none; animation: scrollhex 120s linear infinite; }
+  .hex.l { left: 14px; } .hex.r { right: 14px; text-align: right; animation-direction: reverse; }
+  @keyframes scrollhex { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+  .stk { position: absolute; transform: rotate(var(--r)); opacity: .85; }
+  canvas.stk { image-rendering: pixelated; width: 64px; height: 64px; filter: drop-shadow(0 0 5px rgba(156,255,87,.5)); }
+  canvas.stk.inv { width: 66px; height: 48px; }
+  .tag { font-size: 11px; line-height: 1.5; color: #9cff57; padding: 8px 10px; box-shadow: 0 0 0 3px #3a7a22; background: rgba(11,20,11,.8); text-shadow: 0 0 6px rgba(156,255,87,.6); }
+  .tag.fill { background: #6fd13a; color: #0b140b; box-shadow: 0 0 0 3px #0b140b, 0 0 0 5px #6fd13a; text-shadow: none; }
+  .cart { width: 78px; height: 92px; background: #8e8e98; box-shadow: 0 0 0 3px #000, inset 5px 5px 0 #b4b4bd, inset -5px -5px 0 #55565e; clip-path: polygon(0 0, 100% 0, 100% 80%, 86% 100%, 0 100%); padding: 10px 8px; }
+  .cart i { display: block; font-style: normal; font-size: 8px; background: #6fd13a; color: #0b140b; text-align: center; padding: 14px 0; box-shadow: 0 0 0 2px #000; }
+}
