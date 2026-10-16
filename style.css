@@ -7,7 +7,7 @@ body { font-family: 'PS2P', monospace; color: var(--g); font-size: 12px; line-he
 /* ---------- Game Boy body ---------- */
 #gb { --poly: polygon(0 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% calc(100% - 28px), calc(100% - 8px) calc(100% - 28px), calc(100% - 8px) calc(100% - 20px), calc(100% - 16px) calc(100% - 20px), calc(100% - 16px) calc(100% - 12px), calc(100% - 24px) calc(100% - 12px), calc(100% - 24px) calc(100% - 4px), calc(100% - 32px) calc(100% - 4px), calc(100% - 32px) 100%, 8px 100%, 8px calc(100% - 4px), 4px calc(100% - 4px), 4px calc(100% - 8px), 0 calc(100% - 8px));
   box-sizing: border-box; width: min(calc(100% - 16px), 440px); height: calc(100dvh - 16px); max-height: 940px; margin: 8px auto; background: #000; clip-path: var(--poly); padding: 4px; }
-#gbi { width: 100%; height: 100%; background: #cfcfd4; clip-path: var(--poly); display: flex; flex-direction: column; padding: 12px 10px 10px; gap: 10px;
+#gbi { width: 100%; height: 100%; background: #cfcfd4; clip-path: var(--poly); display: flex; flex-direction: column; padding: 10px 10px 6px; gap: 6px;
   box-shadow: inset 4px 4px 0 #ececf0, inset -6px -6px 0 #9a9aa4; }
 #bezel { position: relative; flex: 1; min-height: 0; background: #4d4e57; padding: 20px 8px 14px; display: flex; flex-direction: column; clip-path: polygon(0 6px, 4px 6px, 4px 3px, 6px 3px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 4px) 3px, calc(100% - 4px) 6px, 100% 6px, 100% calc(100% - 24px), calc(100% - 8px) calc(100% - 24px), calc(100% - 8px) calc(100% - 12px), calc(100% - 16px) calc(100% - 12px), calc(100% - 16px) calc(100% - 6px), calc(100% - 22px) calc(100% - 6px), calc(100% - 22px) 100%, 8px 100%, 8px calc(100% - 4px), 3px calc(100% - 4px), 3px calc(100% - 8px), 0 calc(100% - 8px));
   box-shadow: inset 0 0 0 4px #25252c; }
@@ -106,28 +106,23 @@ input::placeholder { color: var(--dim); }
 .wheelwrap .ptr { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 24px solid #ff6a2a; z-index: 2; }
 .wheelwrap .hub { position: absolute; inset: 43%; background: var(--bg); box-shadow: 0 0 0 3px var(--g); }
 
-/* ---------- controls ---------- */
-#ctl { position: relative; flex: none; height: 200px; }
-#ctl b { cursor: pointer; }
-#dpad { position: absolute; left: 6px; top: 22px; width: 138px; height: 138px; display: grid; grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
-#dpad b, #dpad i { background: #2b2b33; display: block; box-shadow: inset 4px 4px 0 #4a4a55, inset -4px -4px 0 #15151a; }
-#dpad b:nth-of-type(1) { box-shadow: 0 -4px 0 #000, -4px 0 0 #000, 4px 0 0 #000, inset 4px 4px 0 #4a4a55, inset -4px 0 0 #15151a; }
-#dpad b:nth-of-type(2) { box-shadow: 0 -4px 0 #000, 0 4px 0 #000, -4px 0 0 #000, inset 4px 4px 0 #4a4a55, inset 0 -4px 0 #15151a; }
-#dpad b:nth-of-type(3) { box-shadow: 0 -4px 0 #000, 0 4px 0 #000, 4px 0 0 #000, inset 0 4px 0 #4a4a55, inset -4px -4px 0 #15151a; }
-#dpad b:nth-of-type(4) { box-shadow: 0 4px 0 #000, -4px 0 0 #000, 4px 0 0 #000, inset 4px 0 0 #4a4a55, inset -4px -4px 0 #15151a; }
-#dpad b.dn { background: #1a1a20; transform: translateY(2px); }
-#ab { position: absolute; right: 10px; top: 8px; width: 128px; height: 140px; }
-#ab .round { position: absolute; width: 56px; height: 56px; background: #c2185b; box-shadow: 0 0 0 4px #000, inset 6px 6px 0 #ff6aa6, inset -6px -6px 0 #7a0e3a;
-  clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px), 0 8px, 8px 8px); box-shadow: inset 0 0 0 4px #000, inset 8px 8px 0 #ff6aa6; background: #c2185b; border: 0; }
-#ab .round.dn { transform: translateY(3px); filter: brightness(.8); }
+/* ---------- controls: compact visuals, big invisible hit areas ---------- */
+#ctl { position: relative; flex: none; height: 184px; margin: 0 -6px; touch-action: none; }
+#ctl [data-k] { position: absolute; touch-action: none; cursor: pointer; -webkit-user-select: none; }
+#dpad { position: absolute; left: 0; top: 2px; width: 180px; height: 180px; display: grid; grid-template: 60px 60px 60px / 60px 60px 60px; }
+#dpad b, #dpad i { position: relative; display: block; }
+#dpad b::before, #dpad i::before { content: ''; position: absolute; background: #2b2b33; }
+#dpad i::before { inset: 10px; box-shadow: inset 4px 4px 0 #4a4a55, inset -4px -4px 0 #15151a; }
+#dpad b:nth-of-type(1)::before { inset: 15px 10px 0 10px; box-shadow: 0 -4px 0 #000, -4px 0 0 #000, 4px 0 0 #000, inset 4px 4px 0 #4a4a55, inset -4px 0 0 #15151a; }
+#dpad b:nth-of-type(2)::before { inset: 10px 0 10px 15px; box-shadow: 0 -4px 0 #000, 0 4px 0 #000, -4px 0 0 #000, inset 4px 4px 0 #4a4a55, inset 0 -4px 0 #15151a; }
+#dpad b:nth-of-type(3)::before { inset: 10px 15px 10px 0; box-shadow: 0 -4px 0 #000, 0 4px 0 #000, 4px 0 0 #000, inset 0 4px 0 #4a4a55, inset -4px -4px 0 #15151a; }
+#dpad b:nth-of-type(4)::before { inset: 0 10px 15px 10px; box-shadow: 0 4px 0 #000, -4px 0 0 #000, 4px 0 0 #000, inset 4px 0 0 #4a4a55, inset -4px -4px 0 #15151a; }
+#dpad b.dn::before { background: #14141a; }
+#ab { position: absolute; right: 0; top: 24px; width: 156px; height: 150px; }
+#ab .round { width: 74px; height: 74px; }
+#ab .round::before { content: ''; position: absolute; inset: 8px; background: #c2185b; border: 0; clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px), 0 8px, 8px 8px); box-shadow: inset 0 0 0 4px #000, inset 8px 8px 0 #ff6aa6; }
+#ab .round.dn::before { filter: brightness(.7); }
 #ab span { position: absolute; font-size: 12px; color: #4a4a95; }
-#pills b { position: absolute; top: 164px; width: 62px; height: 18px; background: #55565e; transform: skewX(-20deg); box-shadow: 0 0 0 3px #000, inset 0 -4px 0 #30313a; }
-#pills b.dn { transform: skewX(-20deg) translateY(2px); }
-#pills b:nth-of-type(1) { left: 22px; } #pills b:nth-of-type(2) { left: 98px; }
-#pills span { position: absolute; top: 184px; font-size: 7px; color: #4a4a95; } #pills span:nth-of-type(1) { left: 24px; } #pills span:nth-of-type(2) { left: 108px; }
-#spk { position: absolute; right: 4px; bottom: -4px; width: 70px; height: 48px; }
-#spk i { position: absolute; width: 6px; height: 38px; background: #8e8e98; box-shadow: 0 0 0 0 #000, inset -2px 0 0 #55565e; transform: rotate(-30deg); }
-#spk i:nth-child(1) { left: 0; } #spk i:nth-child(2) { left: 16px; } #spk i:nth-child(3) { left: 32px; } #spk i:nth-child(4) { left: 48px; }
 #over.boom .big { --dc: #fff4d0; }
 
 .camwrap { display: flex; align-items: center; justify-content: center; width: 100%; }
@@ -155,3 +150,18 @@ body { background: transparent; }
   .cart { width: 78px; height: 92px; background: #8e8e98; box-shadow: 0 0 0 3px #000, inset 5px 5px 0 #b4b4bd, inset -5px -5px 0 #55565e; clip-path: polygon(0 0, 100% 0, 100% 80%, 86% 100%, 0 100%); padding: 10px 8px; }
   .cart i { display: block; font-style: normal; font-size: 8px; background: #6fd13a; color: #0b140b; text-align: center; padding: 14px 0; box-shadow: 0 0 0 2px #000; }
 }
+
+/* ---------- touch rules: in-game options are D-pad + A only ---------- */
+#card, #over { pointer-events: none; }
+#card input[type=text], #card #snap { pointer-events: auto; }
+#top .btn { pointer-events: auto; }
+.pick { position: relative; }
+.btn.foc::before, .pick.foc::before { content: ''; position: absolute; width: 0; height: 0; border-left: 10px solid var(--bg); border-top: 7px solid transparent; border-bottom: 7px solid transparent; animation: arrow .5s steps(2) infinite; }
+.btn.foc::before { left: 10px; top: 50%; margin-top: -7px; }
+.pick.foc::before { left: 6px; top: 6px; }
+@keyframes arrow { 50% { opacity: 0; } }
+#tmr { width: 70px; height: 17px; image-rendering: pixelated; filter: drop-shadow(0 0 4px rgba(156,255,87,.6)); }
+#tmr.hot { filter: drop-shadow(0 0 5px rgba(255,106,42,.8)); }
+#mid { display: flex; align-items: center; gap: 6px; }
+#top .btn.sm { min-width: 0; padding: 8px 8px; }
+#ctl #dpad [data-k] { position: relative; }
