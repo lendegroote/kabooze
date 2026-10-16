@@ -238,9 +238,17 @@
     var el = document.documentElement, fsEl = document.fullscreenElement || document.webkitFullscreenElement;
     var req = el.requestFullscreen || el.webkitRequestFullscreen, ex = document.exitFullscreen || document.webkitExitFullscreen;
     if (fsEl) { if (ex) ex.call(document); return; }
-    if (req && !/iPhone|iPod/.test(navigator.userAgent)) { try { var p = req.call(el); if (p && p.catch) p.catch(tip); } catch (e) { tip(); } return; }
+    if (req && !/iPhone|iPod/.test(navigator.userAgent)) { try { var p = req.call(el); if (p && p.then) p.then(lockPortrait); if (p && p.catch) p.catch(tip); } catch (e) { tip(); } return; }
     tip();
   });
+  function lockPortrait() { try { var l = screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait'); if (l && l.catch) l.catch(function () {}); } catch (e) {} }
+  // landscape on touch devices is counter-rotated in CSS; which way depends on how the phone was turned
+  function syncRot() {
+    var a = (screen.orientation && screen.orientation.angle !== undefined) ? screen.orientation.angle : (window.orientation || 0);
+    document.body.classList.toggle('rotl', a === 270 || a === -90);
+  }
+  syncRot(); window.addEventListener('orientationchange', syncRot); window.addEventListener('resize', syncRot);
+  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', syncRot);
   function tip() {
     over.hidden = false; over.className = '';
     over.innerHTML = '<div class="box"><h2>VOLLEDIG SCHERM</h2><div class="how"><div>ZET HEM OP JE STARTSCHERM VOOR VOLLEDIG SCHERM</div></div>' + btn('tx', 'OK', '#3bd16f') + '</div>';

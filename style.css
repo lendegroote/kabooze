@@ -162,3 +162,12 @@ button, .pick, .btn, input, select { touch-action: manipulation; }
 
 #top .btn.sm { min-height: 48px; }
 .btn:active, .pick:active { transform: translateY(2px); }
+
+/* never show landscape: on touch devices held sideways, counter-rotate the whole app so it looks like portrait lock */
+@media (orientation: landscape) and (pointer: coarse) {
+  html, body { overflow: hidden; }
+  body { position: fixed; top: 0; left: 0; width: 100vh; height: 100vw; transform-origin: 0 0; transform: translate(100vw, 0) rotate(90deg); }
+  body.rotl { transform: translate(0, 100vh) rotate(-90deg); }
+  #gb { height: calc(100vw - 8px); }
+  #desk { display: none; }
+}
