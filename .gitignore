@@ -1,0 +1,6 @@
+briefs/
+assets/reference-*.png
+.DS_Store
+js/main.js
+js/game.js
+data/questions.js
