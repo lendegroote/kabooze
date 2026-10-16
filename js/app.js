@@ -21,7 +21,9 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S.players)); } catch (e) {} }
   function snd(n) { if (S.snd) try { SFX[n](); } catch (e) {} }
   function nm(i) { return S.players[i].name || ('P' + (i + 1)); }
-  function show(html) { card.innerHTML = html; }
+  function show(html) { card.innerHTML = html; card.classList.remove('rd'); }
+  // round choice screens: options are D-pad + A only (no touch)
+  function showR(html) { show(html); card.classList.add('rd'); }
   function go(fn) { stopCam(); S.cur = fn; fn(); }
 
   var initCache = {};
@@ -127,10 +129,10 @@
   }
 
   // ---------- roulette ----------
-  var WT = ROULETTE.reduce(function (t, r) { return t + r.wt; }, 0);
+  function getWT() { return ROULETTE.reduce(function (t, r) { return t + r.wt; }, 0); }
   function wheelCanvas() {
     var c = document.createElement('canvas'); c.width = c.height = 160;
-    var g = c.getContext('2d'), acc = 0;
+    var g = c.getContext('2d'), acc = 0, WT = getWT();
     ROULETTE.forEach(function (r, i) {
       var span = r.wt / WT * Math.PI * 2, a0 = -Math.PI / 2 + acc * Math.PI * 2 / WT;
       acc += r.wt;
@@ -145,7 +147,7 @@
     return c;
   }
   function pickSlice() {
-    var x = Math.random() * WT, acc = 0;
+    var WT = getWT(), x = Math.random() * WT, acc = 0;
     for (var i = 0; i < ROULETTE.length; i++) { acc += ROULETTE[i].wt; if (x < acc) return { i: i, mid: (acc - ROULETTE[i].wt + (x - (acc - ROULETTE[i].wt))) / WT * 360 }; }
   }
   function resultText(r, who) {
@@ -204,7 +206,7 @@
     over.hidden = false; over.className = '';
     over.innerHTML = '<div class="box"><h2>PAUSED</h2>' + btn('m1', 'RESUME', '#3bd16f') +
       (S.inGame ? btn('m2', 'RESTART', '#ff9f1c') : '') + btn('m3', 'GO BACK TO START', '#3ec6ff') +
-      btn('m4', 'SFX: ' + (S.snd ? 'ON' : 'OFF'), '#ffd23f') + btn('m5', 'MUSIC: ' + (MUS.on ? 'ON' : 'OFF'), '#ffd23f') + '</div>';
+      btn('m4', 'SFX: ' + (S.snd ? 'ON' : 'OFF'), '#ffd23f') + btn('m5', 'MUSIC: ' + (MUS.on ? 'ON' : 'OFF'), '#ffd23f') + btn('m6', 'CONTENT', '#3ec6ff') + btn('m7', 'FULLSCREEN', '#3ec6ff') + '</div>';
     on('m1', close);
     on('m2', function () { close(); stopGame(); startGame(); });
     on('m3', function () {
@@ -213,6 +215,8 @@
       confirmBox('SURE? GAME IS LOST', function () { stopGame(); go(title); });
     });
     on('m4', function () { S.snd = !S.snd; $('#m4').textContent = 'SFX: ' + (S.snd ? 'ON' : 'OFF'); });
+    on('m7', function () { close(); $('#fs').click(); });
+    on('m6', function () { window.open('content.html', '_blank'); });
     on('m5', function () { MUS.on = !MUS.on; if (MUS.on) MUS.start(); else MUS.stop(); $('#m5').textContent = 'MUSIC: ' + (MUS.on ? 'ON' : 'OFF'); });
   });
   $('#fs').addEventListener('click', function () {
@@ -395,7 +399,10 @@
   function stopGame() { S.fuseOn = false; S.inGame = false; S.modal = false; $('#tb').classList.remove('hot'); }
   function startGame() {
     S.drinks = S.players.map(function () { return 0; });
-    S.usedQ = []; S.dbl = []; S.rn = 0; S.posts = []; S.askPosts = true; S.inGame = true; S.fuseOn = true; S.modal = false; resetFuse();
+    S.usedQ = []; S.dbl = []; S.rn = 0; S.posts = []; S.askPosts = true; S.inGame = true;
+    CUSTOM_POSTS.forEach(function (c) {
+      S.players.forEach(function (p, i) { if ((p.name || '').toLowerCase() === String(c.author).trim().toLowerCase()) S.posts.push({ by: i, text: c.text, used: false }); });
+    }); S.fuseOn = false; S.fresh = true; S.modal = false;
     secrets(0, []);
   }
   function pass(i, next) {
@@ -414,7 +421,8 @@
     return pool[rnd(pool.length)];
   }
   function secrets(k, list) {
-    if (k >= S.players.length) { S.ans = list; S.askPosts = false; return startR1(); }
+    if (k === 0) S.fuseOn = false;   // no fuse, tick or countdown while answers are being given
+    if (k >= S.players.length) { S.ans = list; S.askPosts = false; return startCycle(); }
     pass(k, function () {
       var q = newQ();
       go(function () {
@@ -442,7 +450,7 @@
   }
   function nextSecret() {
     var r = S.r1;
-    if (!r.left.length) return startR2();
+    if (!r.left.length) return runNext();
     var k = -1;
     for (var i = 0; i < r.left.length; i++) if (r.left[i].by !== r.g) { k = i; break; }
     if (k < 0) { // only own answers left: hand over to someone else
@@ -458,7 +466,7 @@
     var g = L.g, all = S.players.map(function (p, i) { return i; });
     go(function () {
       S.holder = g;
-      show('<div class="scr">' + (post ? postCard(a.text) : '<div class="quote"><div class="qq">' + esc(a.q) + '</div><div class="aa y">&gt; ' + esc(nm(a.pick)) + '</div></div><h2>WHO SAID IT?</h2>') +
+      showR('<div class="scr">' + (post ? postCard(a.text) : '<div class="quote"><div class="qq">' + esc(a.q) + '</div><div class="aa y">&gt; ' + esc(nm(a.pick)) + '</div></div><h2>WHO SAID IT?</h2>') +
         '<div class="scroll">' + pickGrid(all, null, function (i) { return wrong.indexOf(i) >= 0 ? 'bad' : ''; }) + '</div><div class="cd big" id="cd"></div><div class="toast" id="toast"></div></div>');
       var tok = S.lockTok = {};
       function tick() {
@@ -493,12 +501,12 @@
   // ---------- round 2: most likely to ----------
   function startR2() {
     S.rn++;
-    S.r2 = { prompts: shuffle(PROMPTS).slice(0, 3), p: 0 };
+    S.r2 = { prompts: shuffle(PROMPTS).slice(0, 4), p: 0 };
     prompt2();
   }
   function prompt2() {
     var r = S.r2;
-    if (r.p >= r.prompts.length) return startR3();
+    if (r.p >= r.prompts.length) return runNext();
     r.votes = []; vote(0);
   }
   function vote(v) {
@@ -507,7 +515,7 @@
     pass(v, function () {
       go(function () {
         S.holder = v;
-        show('<div class="scr"><div class="quote"><div class="aa y">' + esc(r.prompts[r.p]) + '</div></div><div class="sub">TAP YOUR VOTE. SECRET!</div><div class="scroll">' + pickGrid(all) + '</div></div>');
+        showR('<div class="scr"><div class="quote"><div class="aa y">' + esc(r.prompts[r.p]) + '</div></div><div class="sub">TAP YOUR VOTE. SECRET!</div><div class="scroll">' + pickGrid(all) + '</div></div>');
         bindPicks(function (i) { snd('ok'); r.votes.push(i); vote(v + 1); });
       });
     });
@@ -523,7 +531,7 @@
       cnt.forEach(function (c, i) {
         h += '<div class="bar' + (win.indexOf(i) >= 0 ? ' win' : '') + '" style="--k:' + COL[i % 8] + '">' + c + av(i, 'sm') + '<div class="col" style="height:' + (max ? Math.max(4, c / max * 120) : 4) + 'px"></div><span style="font-size:8px">' + esc(nm(i)) + '</span></div>';
       });
-      h += '</div><div class="big y">' + win.map(function (i) { return esc(nm(i)); }).join(' &amp; ') + ' DRINK' + (win.length > 1 ? '' : 'S') + ' ' + max + '</div><div class="sub">THE TABLE HAS SPOKEN.</div><div class="grow"></div>' + btn('nx', r.p < 2 ? 'NEXT' : 'DONE', '#3bd16f') + '</div>';
+      h += '</div><div class="big y">' + win.map(function (i) { return esc(nm(i)); }).join(' &amp; ') + ' DRINK' + (win.length > 1 ? '' : 'S') + ' ' + max + '</div><div class="sub">THE TABLE HAS SPOKEN.</div><div class="grow"></div>' + btn('nx', r.p < r.prompts.length - 1 ? 'NEXT' : 'DONE', '#3bd16f') + '</div>';
       show(h);
       on('nx', function () { r.p++; prompt2(); });
     });
@@ -551,14 +559,14 @@
   }
   function startR3() {
     var avail = S.posts.filter(function (p) { return !p.used; });
-    if (!avail.length) return loopScreen();
+    if (!avail.length) return runNext();
     S.rn++;
     S.r3 = { left: shuffle(avail), g: rnd(S.players.length), lockUntil: 0 };
     nextPost();
   }
   function nextPost() {
     var r = S.r3;
-    if (!r.left.length) { S.posts = []; savePosts(); return loopScreen(); }
+    if (!r.left.length) { S.posts = []; savePosts(); return runNext(); }
     var k = -1;
     for (var i = 0; i < r.left.length; i++) if (r.left[i].by !== r.g) { k = i; break; }
     if (k < 0) {
@@ -568,6 +576,113 @@
     }
     var a = r.left.splice(k, 1)[0], wrong = []; a.used = true;
     pass(r.g, function () { guess(a, wrong, r, 'post'); });
+  }
+
+
+  // ---------- round rotation: random order, bomb ticks through all ----------
+  var ROUNDS = {
+    who: { name: 'WHO SAID IT', rule: 'GUESS WHO PICKED WHO. WRONG GUESS = DRINK + 3 SECOND LOCK.', start: function () { startR1(); } },
+    likely: { name: 'MOST LIKELY TO', rule: 'VOTE IN SECRET. THE TABLE DECIDES.', start: function () { startR2(); } },
+    post: { name: 'WHO POSTED THIS', rule: 'GUESS WHO WROTE THE CRINGE POST.', start: function () { startR3(); } },
+    hot: { name: 'HOT POTATO', rule: 'SAY ONE OUT LOUD, PRESS A, PASS FAST. STUCK = DRINK.', start: function () { startHot(); } },
+    tot: { name: 'THIS OR THAT', rule: 'PICK IN SECRET. THE MINORITY DRINKS.', start: function () { startTot(); } },
+    never: { name: 'NEVER HAVE I EVER', rule: 'DID IT? DRINK. HOLDER PRESSES A FOR NEXT.', start: function () { startNever(); } }
+  };
+  function startCycle() {
+    var q = ['who', 'likely', 'hot', 'tot', 'never'];
+    if (S.posts.some(function (p) { return !p.used; })) q.push('post');
+    S.queue = shuffle(q);
+    runNext();
+  }
+  function runNext() {
+    if (!S.queue || !S.queue.length) return loopScreen();
+    var R = ROUNDS[S.queue.shift()];
+    go(function () {
+      show('<div class="scr center"><div class="grow"></div><div class="big y" style="font-size:20px">' + R.name + '</div><div class="sub">' + R.rule + '</div><div class="grow"></div>' + btn('go', 'GO', '#3bd16f') + '</div>');
+      on('go', function () {
+        snd('go');
+        if (!S.fuseOn) { if (S.fresh) { resetFuse(); S.fresh = false; } S.fuseOn = true; S.modal = false; }   // fuse starts when the first round begins
+        R.start();
+      });
+    });
+  }
+
+  // ---------- HOT POTATO ----------
+  function startHot() {
+    S.rn++; S.hot = { cats: shuffle(CATEGORIES).slice(0, 5), c: 0, g: rnd(S.players.length) };
+    hotTurn();
+  }
+  function hotTurn() {
+    var h = S.hot, n = S.players.length;
+    if (h.c >= h.cats.length) return runNext();
+    go(function () {
+      S.holder = h.g;
+      showR('<div class="scr center"><div class="quote"><div class="aa y">' + esc(h.cats[h.c]) + '</div></div>' + av(h.g, 'lg') +
+        '<div class="big y" style="font-size:16px">' + esc(nm(h.g)) + ', GO!</div><div class="sub">SAY ONE OUT LOUD. PRESS A. PASS FAST.</div><div class="grow"></div>' +
+        btn('stk', 'STUCK, DRINK', '#ff9f1c') + btn('got', 'SAID ONE', '#3bd16f') + '</div>');
+      on('got', function () { snd('ok'); h.g = (h.g + 1) % n; hotTurn(); });
+      on('stk', function () { snd('bad'); drink(h.g, 1); hotStuck(); });
+    });
+  }
+  function hotStuck() {
+    var h = S.hot, n = S.players.length, who = h.g;
+    go(function () {
+      S.holder = who;
+      show('<div class="scr center"><div class="grow"></div><div class="big r">NOTHING?</div>' + av(who, 'xl') + '<div class="big y" style="font-size:15px">' + esc(nm(who)) + ' DRINKS. SKILL ISSUE.</div><div class="grow"></div>' + btn('nx', 'NEXT', '#3bd16f') + '</div>');
+      on('nx', function () { h.c++; h.g = (who + 1) % n; hotTurn(); });
+    });
+  }
+
+  // ---------- THIS OR THAT ----------
+  function startTot() {
+    S.rn++; S.tot = { d: shuffle(DILEMMAS).slice(0, 4), votes: [] };
+    totPlayer(0);
+  }
+  function totPlayer(v) {
+    if (v >= S.players.length) return totReveal(0);
+    pass(v, function () { totAsk(v, 0, []); });
+  }
+  function totAsk(v, k, ans) {
+    var t = S.tot;
+    if (k >= t.d.length) { t.votes[v] = ans; return totPlayer(v + 1); }
+    go(function () {
+      S.holder = v; var d = t.d[k];
+      showR('<div class="scr"><h2>THIS OR THAT?</h2><div class="grow"></div><div class="grid c2">' +
+        '<button class="pick" data-i="0" style="min-height:170px;font-size:11px;line-height:1.7;justify-content:center">' + esc(d.a) + '</button>' +
+        '<button class="pick" data-i="1" style="min-height:170px;font-size:11px;line-height:1.7;justify-content:center">' + esc(d.b) + '</button></div>' +
+        '<div class="sub">' + (k + 1) + ' OF ' + t.d.length + '. LEFT OR RIGHT, THEN A.</div><div class="grow"></div></div>');
+      bindPicks(function (i) { snd('ok'); ans.push(i); totAsk(v, k + 1, ans); });
+    });
+  }
+  function totReveal(k) {
+    var t = S.tot, n = S.players.length;
+    if (k >= t.d.length) return runNext();
+    var d = t.d[k], side = [[], []], i;
+    for (i = 0; i < n; i++) side[t.votes[i][k]].push(i);
+    var a = side[0].length, b = side[1].length, msg, losers = [];
+    if (a === b) { msg = 'TIE. EVERYONE DRINKS.'; losers = side[0].concat(side[1]); }
+    else if (!a || !b) { msg = 'EVERYONE AGREES. NOBODY DRINKS.'; }
+    else { losers = a < b ? side[0] : side[1]; msg = 'MINORITY DRINKS.'; }
+    losers.forEach(function (p) { drink(p, 1); });
+    snd(losers.length ? 'drink' : 'ok');
+    go(function () {
+      var col = function (txt, who) {
+        return '<div class="tcol"><div class="tt">' + esc(txt) + '</div><div class="big y">' + who.length + '</div><div class="tn">' + who.map(function (p) { return esc(nm(p)); }).join('<br>') + '</div></div>';
+      };
+      show('<div class="scr"><div class="grid c2">' + col(d.a, side[0]) + col(d.b, side[1]) + '</div><div class="big y" style="font-size:14px;line-height:1.5">' + msg + '</div><div class="grow"></div>' + btn('nx', k < t.d.length - 1 ? 'NEXT' : 'DONE', '#3bd16f') + '</div>');
+      on('nx', function () { totReveal(k + 1); });
+    });
+  }
+
+  // ---------- NEVER HAVE I EVER ----------
+  function startNever() { S.rn++; S.nv = { l: shuffle(NEVERS).slice(0, 5), i: 0 }; neverShow(); }
+  function neverShow() {
+    var nv = S.nv;
+    if (nv.i >= nv.l.length) return runNext();
+    go(function () {
+      show('<div class="scr center"><div class="grow"></div><div class="quote"><div class="aa y">' + esc(nv.l[nv.i]) + '</div></div><div class="sub">IF YOU DID IT, DRINK.</div><div class="grow"></div>' + btn('nx', nv.i < nv.l.length - 1 ? 'NEXT' : 'DONE', '#3bd16f') + '</div>');
+      on('nx', function () { snd('ok'); nv.i++; neverShow(); });
+    });
   }
 
   // ---------- loop / end ----------
@@ -600,6 +715,6 @@
     }
     $('#hexl').textContent = out + out; $('#hexr').textContent = out.split('').reverse().join('') + out;
   })();
-  window.KABOOZE = { S: S, roulette: roulette, pickSlice: pickSlice };
+  window.KABOOZE = { S: S, roulette: roulette, pickSlice: pickSlice, runNext: runNext };
   title();
 })();

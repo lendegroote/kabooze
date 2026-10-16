@@ -1,0 +1,31 @@
+@font-face { font-family: 'PS2P'; src: url('assets/fonts/pressstart2p.ttf') format('truetype'); font-display: swap; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: #070c07; }
+body { font-family: 'PS2P', monospace; color: #9cff57; font-size: 11px; line-height: 1.6; text-transform: uppercase; text-shadow: 0 0 6px rgba(156,255,87,.6);
+  background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,.3) 0 1px, transparent 1px 3px); min-height: 100vh; }
+main { max-width: 760px; margin: 0 auto; padding: 16px 14px 60px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+h1 { font-size: 16px; font-weight: normal; }
+h2 { font-size: 12px; font-weight: normal; margin: 22px 0 8px; padding: 8px; background: #6fd13a; color: #0b140b; text-shadow: none; position: sticky; top: 0; z-index: 2; }
+.note { color: #6fd13a; font-size: 9px; margin-bottom: 12px; }
+.b, button { font: inherit; font-size: 10px; text-transform: uppercase; color: #9cff57; background: #12260f; border: 0; padding: 12px 10px; min-height: 44px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 3px #6fd13a; text-shadow: inherit; }
+.b:active, button:active { background: #9cff57; color: #0b140b; }
+input { font: inherit; font-size: 16px; text-transform: uppercase; width: 100%; height: 48px; padding: 0 10px; color: #9cff57; background: #07100a; border: 0; outline: 0; caret-color: #9cff57; caret-shape: block; box-shadow: 0 0 0 3px #3a7a22; margin-bottom: 14px; }
+input:focus { box-shadow: 0 0 0 3px #9cff57; }
+.bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+#rc { color: #6fd13a; font-size: 9px; }
+.it { display: flex; align-items: center; gap: 10px; padding: 10px 6px; border-bottom: 2px solid #1c3a14; }
+.it span { flex: 1; min-width: 0; word-break: break-word; font-size: 10px; }
+.it small { display: block; color: #3a7a22; font-size: 8px; }
+.it button { flex: none; min-height: 40px; font-size: 9px; }
+.it.gone span { text-decoration: line-through; color: #3a7a22; }
+.it.gone button { box-shadow: 0 0 0 3px #ff6a2a; color: #ff6a2a; }
+
+details { margin: 14px 0; box-shadow: 0 0 0 3px #3a7a22; padding: 10px; }
+summary { cursor: pointer; font-size: 11px; min-height: 28px; }
+details > * { margin-top: 10px; }
+select, textarea { font: inherit; font-size: 16px; text-transform: uppercase; width: 100%; padding: 10px; color: #9cff57; background: #07100a; border: 0; outline: 0; box-shadow: 0 0 0 3px #3a7a22; display: block; }
+textarea { text-transform: none; font-size: 12px; }
+details input { margin-bottom: 0; }
+.msg { font-size: 9px; color: #ff6a2a; }

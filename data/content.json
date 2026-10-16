@@ -1,0 +1,908 @@
+[
+ {
+  "id": "who-001",
+  "type": "who",
+  "text": "WHO WOULD GET LOST IN IKEA AND CALL 112?"
+ },
+ {
+  "id": "who-002",
+  "type": "who",
+  "text": "WHO STILL HAS A MSN NAME WITH ~*~?"
+ },
+ {
+  "id": "who-003",
+  "type": "who",
+  "text": "WHO WOULD CRY AT A DOG FOOD AD?"
+ },
+ {
+  "id": "who-004",
+  "type": "who",
+  "text": "WHO GOES TO THE GYM ONLY FOR THE SELFIE?"
+ },
+ {
+  "id": "who-005",
+  "type": "who",
+  "text": "WHO WOULD BE FIRST TO DIE IN A HORROR MOVIE BY SAYING 'HELLO?'"
+ },
+ {
+  "id": "who-006",
+  "type": "who",
+  "text": "WHO WOULD START A FIGHT WITH A SELF CHECKOUT?"
+ },
+ {
+  "id": "who-007",
+  "type": "who",
+  "text": "WHO TEXTS 'ALMOST THERE' FROM THE COUCH?"
+ },
+ {
+  "id": "who-008",
+  "type": "who",
+  "text": "WHO WOULD CONFESS TO EVERYTHING BEFORE THE POLICE ASK?"
+ },
+ {
+  "id": "who-009",
+  "type": "who",
+  "text": "WHO HAS 47 TABS OPEN AND NO REGRETS?"
+ },
+ {
+  "id": "who-010",
+  "type": "who",
+  "text": "WHO WOULD TRY TO PET A WOLF?"
+ },
+ {
+  "id": "who-011",
+  "type": "who",
+  "text": "WHO ORDERS A SALAD AND EATS HALF OF YOUR FRIES?"
+ },
+ {
+  "id": "who-012",
+  "type": "who",
+  "text": "WHO WOULD SEND A 9 MINUTE VOICE MESSAGE?"
+ },
+ {
+  "id": "who-013",
+  "type": "who",
+  "text": "WHO WOULD GET SCAMMED BY A PRINCE?"
+ },
+ {
+  "id": "who-014",
+  "type": "who",
+  "text": "WHO WOULD ARGUE WITH SIRI AND LOSE?"
+ },
+ {
+  "id": "who-015",
+  "type": "who",
+  "text": "WHO WOULD CRY FIRST WITHOUT WIFI FOR A DAY?"
+ },
+ {
+  "id": "who-016",
+  "type": "who",
+  "text": "WHO PAYS 9 EURO FOR A BEER AND SAYS 'IT'S FINE'?"
+ },
+ {
+  "id": "who-017",
+  "type": "who",
+  "text": "WHO WOULD GET BANNED FROM A KARAOKE BAR?"
+ },
+ {
+  "id": "who-018",
+  "type": "who",
+  "text": "WHO WOULD FALL ASLEEP AT THEIR OWN BIRTHDAY?"
+ },
+ {
+  "id": "who-019",
+  "type": "who",
+  "text": "WHO WOULD JOIN A PYRAMID SCHEME BY ACCIDENT?"
+ },
+ {
+  "id": "who-020",
+  "type": "who",
+  "text": "WHO WOULD LIKE THEIR EX'S PHOTO FROM 2017 AT 3AM?"
+ },
+ {
+  "id": "who-021",
+  "type": "who",
+  "text": "WHO BRINGS A SALAD TO A BBQ AND JUDGES EVERYONE?"
+ },
+ {
+  "id": "who-022",
+  "type": "who",
+  "text": "WHO FAKES A PHONE CALL TO ESCAPE A CONVERSATION?"
+ },
+ {
+  "id": "who-023",
+  "type": "who",
+  "text": "WHO WOULD CRY DURING THEIR OWN SPEECH?"
+ },
+ {
+  "id": "who-024",
+  "type": "who",
+  "text": "WHO WOULD GET CHASED BY A SWAN?"
+ },
+ {
+  "id": "who-025",
+  "type": "who",
+  "text": "WHO WOULD LOSE A STARING CONTEST WITH A GOAT?"
+ },
+ {
+  "id": "who-026",
+  "type": "who",
+  "text": "WHO WOULD SAY 'I'M NOT DRUNK' WHILE HUGGING A BIN?"
+ },
+ {
+  "id": "who-027",
+  "type": "who",
+  "text": "WHO WOULD TAKE A TAXI TO THE WRONG CITY?"
+ },
+ {
+  "id": "who-028",
+  "type": "who",
+  "text": "WHO SECRETLY KNOWS EVERY WORD OF A CRINGE SONG?"
+ },
+ {
+  "id": "who-029",
+  "type": "who",
+  "text": "WHO WOULD STEAL THE PEN FROM THE BANK?"
+ },
+ {
+  "id": "who-030",
+  "type": "who",
+  "text": "WHO WOULD BUY A BOAT ON IMPULSE?"
+ },
+ {
+  "id": "likely-001",
+  "type": "likely",
+  "text": "MOST LIKELY TO TEXT THEIR EX TONIGHT"
+ },
+ {
+  "id": "likely-002",
+  "type": "likely",
+  "text": "MOST LIKELY TO BE SINGLE AT 50"
+ },
+ {
+  "id": "likely-003",
+  "type": "likely",
+  "text": "MOST LIKELY TO CRY IN THE TOILETS"
+ },
+ {
+  "id": "likely-004",
+  "type": "likely",
+  "text": "MOST LIKELY TO TALK BEHIND YOUR BACK"
+ },
+ {
+  "id": "likely-005",
+  "type": "likely",
+  "text": "MOST LIKELY TO GET FIRED FOR A STUPID REASON"
+ },
+ {
+  "id": "likely-006",
+  "type": "likely",
+  "text": "MOST LIKELY TO FORGET THE ROUND THEY OWE"
+ },
+ {
+  "id": "likely-007",
+  "type": "likely",
+  "text": "MOST LIKELY TO START A FIGHT AND LEAVE EARLY"
+ },
+ {
+  "id": "likely-008",
+  "type": "likely",
+  "text": "MOST LIKELY TO LOSE THEIR PHONE TONIGHT"
+ },
+ {
+  "id": "likely-009",
+  "type": "likely",
+  "text": "MOST LIKELY TO FAKE A LAUGH AT YOUR JOKE"
+ },
+ {
+  "id": "likely-010",
+  "type": "likely",
+  "text": "MOST LIKELY TO BECOME A BAD INFLUENCER"
+ },
+ {
+  "id": "likely-011",
+  "type": "likely",
+  "text": "MOST LIKELY TO MARRY FOR MONEY"
+ },
+ {
+  "id": "likely-012",
+  "type": "likely",
+  "text": "MOST LIKELY TO BE ON A TRUE CRIME PODCAST"
+ },
+ {
+  "id": "likely-013",
+  "type": "likely",
+  "text": "MOST LIKELY TO CANCEL ON YOU LAST MINUTE"
+ },
+ {
+  "id": "likely-014",
+  "type": "likely",
+  "text": "MOST LIKELY TO CRY WHEN DRUNK"
+ },
+ {
+  "id": "likely-015",
+  "type": "likely",
+  "text": "MOST LIKELY TO JOIN A CULT"
+ },
+ {
+  "id": "likely-016",
+  "type": "likely",
+  "text": "MOST LIKELY TO SLEEP WITH THEIR BOSS"
+ },
+ {
+  "id": "likely-017",
+  "type": "likely",
+  "text": "MOST LIKELY TO LIE ON THEIR CV"
+ },
+ {
+  "id": "likely-018",
+  "type": "likely",
+  "text": "MOST LIKELY TO ORDER FOR THE WHOLE TABLE AND GET IT WRONG"
+ },
+ {
+  "id": "likely-019",
+  "type": "likely",
+  "text": "MOST LIKELY TO RUIN THE WEDDING"
+ },
+ {
+  "id": "likely-020",
+  "type": "likely",
+  "text": "MOST LIKELY TO BE SECRETLY RICH AND CHEAP"
+ },
+ {
+  "id": "truth-001",
+  "type": "truth",
+  "text": "WHO AT THIS TABLE WOULD YOU HOOK UP WITH?"
+ },
+ {
+  "id": "truth-002",
+  "type": "truth",
+  "text": "WHAT IS THE WORST THING YOU DID ON A DATE?"
+ },
+ {
+  "id": "truth-003",
+  "type": "truth",
+  "text": "WHO HERE DO YOU TRUST LEAST AND WHY?"
+ },
+ {
+  "id": "truth-004",
+  "type": "truth",
+  "text": "WHAT LIE ARE YOU STILL LIVING?"
+ },
+ {
+  "id": "truth-005",
+  "type": "truth",
+  "text": "WHAT IS THE MOST EMBARRASSING THING IN YOUR SEARCH HISTORY?"
+ },
+ {
+  "id": "truth-006",
+  "type": "truth",
+  "text": "WHO WAS YOUR WORST EX AND WHAT DID THEY DO?"
+ },
+ {
+  "id": "truth-007",
+  "type": "truth",
+  "text": "WHAT IS THE PETTIEST THING YOU EVER DID?"
+ },
+ {
+  "id": "truth-008",
+  "type": "truth",
+  "text": "WHO HERE WOULD YOU DELETE FROM YOUR PHONE?"
+ },
+ {
+  "id": "truth-009",
+  "type": "truth",
+  "text": "WHAT DO YOU SECRETLY JUDGE EVERYONE HERE FOR?"
+ },
+ {
+  "id": "truth-010",
+  "type": "truth",
+  "text": "WHAT IS THE LAST THING YOU STOLE?"
+ },
+ {
+  "id": "truth-011",
+  "type": "truth",
+  "text": "WHAT IS YOUR WORST DRUNK DECISION EVER?"
+ },
+ {
+  "id": "truth-012",
+  "type": "truth",
+  "text": "WHO HERE IS THE FAKEST AND WHY?"
+ },
+ {
+  "id": "truth-013",
+  "type": "truth",
+  "text": "WHAT WOULD YOU DO FOR 10000 EURO THAT YOU WOULD NEVER ADMIT?"
+ },
+ {
+  "id": "truth-014",
+  "type": "truth",
+  "text": "WHAT IS THE WORST LIE YOU TOLD YOUR PARTNER?"
+ },
+ {
+  "id": "truth-015",
+  "type": "truth",
+  "text": "WHAT SECRET ARE YOU SCARED GETS OUT?"
+ },
+ {
+  "id": "dare-001",
+  "type": "dare",
+  "text": "LET THE GROUP POST A STORY ON YOUR PHONE."
+ },
+ {
+  "id": "dare-002",
+  "type": "dare",
+  "text": "READ YOUR LAST 5 SEARCHES OUT LOUD."
+ },
+ {
+  "id": "dare-003",
+  "type": "dare",
+  "text": "CALL YOUR MOM AND SAY YOU LOVE HER, ON SPEAKER."
+ },
+ {
+  "id": "dare-004",
+  "type": "dare",
+  "text": "READ YOUR LAST TEXT TO YOUR EX OUT LOUD."
+ },
+ {
+  "id": "dare-005",
+  "type": "dare",
+  "text": "LET THE TABLE PICK YOUR NEXT PROFILE PICTURE."
+ },
+ {
+  "id": "dare-006",
+  "type": "dare",
+  "text": "SHOW THE LAST PHOTO IN YOUR CAMERA ROLL."
+ },
+ {
+  "id": "dare-007",
+  "type": "dare",
+  "text": "DO YOUR BEST IMPRESSION OF EVERYONE AT THE TABLE."
+ },
+ {
+  "id": "dare-008",
+  "type": "dare",
+  "text": "GIVE EACH PERSON ONE HONEST ROAST."
+ },
+ {
+  "id": "dare-009",
+  "type": "dare",
+  "text": "LET SOMEONE DRAW ON YOUR HAND WITH A PEN."
+ },
+ {
+  "id": "dare-010",
+  "type": "dare",
+  "text": "ADMIT YOUR WORST HABIT TO THE WHOLE TABLE."
+ },
+ {
+  "id": "dare-011",
+  "type": "dare",
+  "text": "TALK IN A POSH ACCENT UNTIL YOUR NEXT TURN."
+ },
+ {
+  "id": "dare-012",
+  "type": "dare",
+  "text": "SING THE LAST SONG YOU LISTENED TO, LOUD."
+ },
+ {
+  "id": "dare-013",
+  "type": "dare",
+  "text": "LET THE TABLE WRITE YOU A NEW NICKNAME AND USE IT ALL NIGHT."
+ },
+ {
+  "id": "dare-014",
+  "type": "dare",
+  "text": "SHOW YOUR SCREEN TIME TO EVERYONE."
+ },
+ {
+  "id": "dare-015",
+  "type": "dare",
+  "text": "TELL THE TABLE YOUR MOST CRINGE MEMORY."
+ },
+ {
+  "id": "rl-001",
+  "type": "roulette",
+  "w": "DRINK 2",
+  "n": "DRINK 2",
+  "k": "drink",
+  "c": 2,
+  "wt": 14,
+  "d": "TAKE TWO SIPS."
+ },
+ {
+  "id": "rl-002",
+  "type": "roulette",
+  "w": "TRUTH",
+  "n": "TRUTH",
+  "k": "truth",
+  "wt": 14
+ },
+ {
+  "id": "rl-003",
+  "type": "roulette",
+  "w": "SHOT",
+  "n": "SHOT",
+  "k": "drink",
+  "c": 3,
+  "wt": 10,
+  "d": "TAKE A SHOT (OR 5 SIPS)."
+ },
+ {
+  "id": "rl-004",
+  "type": "roulette",
+  "w": "DARE",
+  "n": "DARE",
+  "k": "dare",
+  "wt": 14
+ },
+ {
+  "id": "rl-005",
+  "type": "roulette",
+  "w": "DRINK 3",
+  "n": "DRINK 3",
+  "k": "drink",
+  "c": 3,
+  "wt": 10,
+  "d": "TAKE THREE SIPS."
+ },
+ {
+  "id": "rl-006",
+  "type": "roulette",
+  "w": "CONFESS",
+  "n": "CONFESS",
+  "k": "confess",
+  "wt": 10
+ },
+ {
+  "id": "rl-007",
+  "type": "roulette",
+  "w": "SAFE",
+  "n": "SAFE!",
+  "k": "safe",
+  "wt": 14,
+  "d": "PHEW. NOTHING HAPPENS."
+ },
+ {
+  "id": "rl-008",
+  "type": "roulette",
+  "w": "DOUBLE",
+  "n": "DOUBLE NEXT ROUND",
+  "k": "double",
+  "wt": 10,
+  "d": "YOUR DRINKS COUNT X2 NEXT ROUND."
+ },
+ {
+  "id": "rl-009",
+  "type": "roulette",
+  "w": "ROUND",
+  "n": "BUY A ROUND",
+  "k": "buy",
+  "wt": 4,
+  "d": "YOU BUY A ROUND FOR THE TABLE. RESPECT."
+ },
+ {
+  "id": "cat-001",
+  "type": "category",
+  "text": "BEER BRANDS"
+ },
+ {
+  "id": "cat-002",
+  "type": "category",
+  "text": "EXES OF PEOPLE AT THIS TABLE"
+ },
+ {
+  "id": "cat-003",
+  "type": "category",
+  "text": "THINGS YOU SHOULDN'T SAY AT A FUNERAL"
+ },
+ {
+  "id": "cat-004",
+  "type": "category",
+  "text": "EXCUSES FOR BEING LATE"
+ },
+ {
+  "id": "cat-005",
+  "type": "category",
+  "text": "THINGS YOU CAN PUT ON FRIES"
+ },
+ {
+  "id": "cat-006",
+  "type": "category",
+  "text": "BAD PICK-UP LINES"
+ },
+ {
+  "id": "cat-007",
+  "type": "category",
+  "text": "REALITY TV SHOWS"
+ },
+ {
+  "id": "cat-008",
+  "type": "category",
+  "text": "THINGS YOU FIND IN A STUDENT KITCHEN"
+ },
+ {
+  "id": "cat-009",
+  "type": "category",
+  "text": "THINGS YOU SHOULD NEVER TEXT AT 3AM"
+ },
+ {
+  "id": "cat-010",
+  "type": "category",
+  "text": "SUPERHEROES"
+ },
+ {
+  "id": "cat-011",
+  "type": "category",
+  "text": "THINGS A DOG WOULD SAY"
+ },
+ {
+  "id": "cat-012",
+  "type": "category",
+  "text": "WORST NAMES FOR A GOLDFISH"
+ },
+ {
+  "id": "cat-013",
+  "type": "category",
+  "text": "THINGS YOU LIE ABOUT ON A CV"
+ },
+ {
+  "id": "cat-014",
+  "type": "category",
+  "text": "COCKTAILS"
+ },
+ {
+  "id": "cat-015",
+  "type": "category",
+  "text": "DISNEY VILLAINS"
+ },
+ {
+  "id": "cat-016",
+  "type": "category",
+  "text": "THINGS YOU HIDE FROM YOUR PARENTS"
+ },
+ {
+  "id": "cat-017",
+  "type": "category",
+  "text": "BAD IDEAS AFTER MIDNIGHT"
+ },
+ {
+  "id": "cat-018",
+  "type": "category",
+  "text": "FAMOUS BELGIANS"
+ },
+ {
+  "id": "cat-019",
+  "type": "category",
+  "text": "OVERRATED THINGS"
+ },
+ {
+  "id": "cat-020",
+  "type": "category",
+  "text": "ANNOYING HABITS OF ROOMMATES"
+ },
+ {
+  "id": "cat-021",
+  "type": "category",
+  "text": "THINGS YOU SAY WHEN CAUGHT LYING"
+ },
+ {
+  "id": "cat-022",
+  "type": "category",
+  "text": "BOARD GAMES THAT END FRIENDSHIPS"
+ },
+ {
+  "id": "cat-023",
+  "type": "category",
+  "text": "THINGS NOBODY ASKED FOR"
+ },
+ {
+  "id": "cat-024",
+  "type": "category",
+  "text": "EXCUSES TO LEAVE A PARTY EARLY"
+ },
+ {
+  "id": "cat-025",
+  "type": "category",
+  "text": "SNACKS YOU EAT STANDING IN THE KITCHEN"
+ },
+ {
+  "id": "tot-001",
+  "type": "tot",
+  "text": "NO PHONE FOR A YEAR OR NO BEER FOR A YEAR",
+  "a": "NO PHONE FOR A YEAR",
+  "b": "NO BEER FOR A YEAR"
+ },
+ {
+  "id": "tot-002",
+  "type": "tot",
+  "text": "ALWAYS SPEAK YOUR THOUGHTS OR NEVER SPEAK AGAIN AT PARTIES",
+  "a": "ALWAYS SPEAK YOUR THOUGHTS",
+  "b": "NEVER SPEAK AGAIN AT PARTIES"
+ },
+ {
+  "id": "tot-003",
+  "type": "tot",
+  "text": "FIGHT 1 HORSE-SIZED DUCK OR FIGHT 100 DUCK-SIZED HORSES",
+  "a": "FIGHT 1 HORSE-SIZED DUCK",
+  "b": "FIGHT 100 DUCK-SIZED HORSES"
+ },
+ {
+  "id": "tot-004",
+  "type": "tot",
+  "text": "READ YOUR EX'S DIARY OR LET YOUR EX READ YOURS",
+  "a": "READ YOUR EX'S DIARY",
+  "b": "LET YOUR EX READ YOURS"
+ },
+ {
+  "id": "tot-005",
+  "type": "tot",
+  "text": "ONLY EAT FRIES FOREVER OR NEVER EAT FRIES AGAIN",
+  "a": "ONLY EAT FRIES FOREVER",
+  "b": "NEVER EAT FRIES AGAIN"
+ },
+ {
+  "id": "tot-006",
+  "type": "tot",
+  "text": "SING EVERY TIME YOU ORDER OR DANCE EVERY TIME YOU WALK IN",
+  "a": "SING EVERY TIME YOU ORDER",
+  "b": "DANCE EVERY TIME YOU WALK IN"
+ },
+ {
+  "id": "tot-007",
+  "type": "tot",
+  "text": "GROUP CHAT SEES YOUR SEARCH HISTORY OR MUM SEES YOUR SEARCH HISTORY",
+  "a": "GROUP CHAT SEES YOUR SEARCH HISTORY",
+  "b": "MUM SEES YOUR SEARCH HISTORY"
+ },
+ {
+  "id": "tot-008",
+  "type": "tot",
+  "text": "LOSE ALL YOUR PHOTOS OR LOSE ALL YOUR CONTACTS",
+  "a": "LOSE ALL YOUR PHOTOS",
+  "b": "LOSE ALL YOUR CONTACTS"
+ },
+ {
+  "id": "tot-009",
+  "type": "tot",
+  "text": "WIN 1000 EURO TODAY OR WIN 100000 IN TEN YEARS",
+  "a": "WIN 1000 EURO TODAY",
+  "b": "WIN 100000 IN TEN YEARS"
+ },
+ {
+  "id": "tot-010",
+  "type": "tot",
+  "text": "NEVER SLEEP IN AGAIN OR NEVER EAT HOT FOOD AGAIN",
+  "a": "NEVER SLEEP IN AGAIN",
+  "b": "NEVER EAT HOT FOOD AGAIN"
+ },
+ {
+  "id": "tot-011",
+  "type": "tot",
+  "text": "HAVE A REALLY LOUD SNEEZE OR HAVE A REALLY LOUD LAUGH",
+  "a": "HAVE A REALLY LOUD SNEEZE",
+  "b": "HAVE A REALLY LOUD LAUGH"
+ },
+ {
+  "id": "tot-012",
+  "type": "tot",
+  "text": "GET STUCK IN A LIFT WITH YOUR BOSS OR GET STUCK IN A LIFT WITH YOUR EX",
+  "a": "GET STUCK IN A LIFT WITH YOUR BOSS",
+  "b": "GET STUCK IN A LIFT WITH YOUR EX"
+ },
+ {
+  "id": "tot-013",
+  "type": "tot",
+  "text": "ALWAYS BE 20 MINUTES LATE OR ALWAYS BE 2 HOURS EARLY",
+  "a": "ALWAYS BE 20 MINUTES LATE",
+  "b": "ALWAYS BE 2 HOURS EARLY"
+ },
+ {
+  "id": "tot-014",
+  "type": "tot",
+  "text": "NO MUSIC FOREVER OR NO MOVIES FOREVER",
+  "a": "NO MUSIC FOREVER",
+  "b": "NO MOVIES FOREVER"
+ },
+ {
+  "id": "tot-015",
+  "type": "tot",
+  "text": "TEXT BACK INSTANTLY OR NEVER TEXT FIRST",
+  "a": "TEXT BACK INSTANTLY",
+  "b": "NEVER TEXT FIRST"
+ },
+ {
+  "id": "tot-016",
+  "type": "tot",
+  "text": "WEAR A COSTUME TO THE NEXT WEDDING OR WEAR PYJAMAS TO THE NEXT FUNERAL",
+  "a": "WEAR A COSTUME TO THE NEXT WEDDING",
+  "b": "WEAR PYJAMAS TO THE NEXT FUNERAL"
+ },
+ {
+  "id": "tot-017",
+  "type": "tot",
+  "text": "KNOW HOW YOU DIE OR KNOW WHEN YOU DIE",
+  "a": "KNOW HOW YOU DIE",
+  "b": "KNOW WHEN YOU DIE"
+ },
+ {
+  "id": "tot-018",
+  "type": "tot",
+  "text": "HAVE FREE BEER FOR LIFE OR HAVE FREE FRIES FOR LIFE",
+  "a": "HAVE FREE BEER FOR LIFE",
+  "b": "HAVE FREE FRIES FOR LIFE"
+ },
+ {
+  "id": "tot-019",
+  "type": "tot",
+  "text": "PAY FOR EVERYONE TONIGHT OR LET EVERYONE PAY FOR YOU",
+  "a": "PAY FOR EVERYONE TONIGHT",
+  "b": "LET EVERYONE PAY FOR YOU"
+ },
+ {
+  "id": "tot-020",
+  "type": "tot",
+  "text": "LIVE WITH YOUR PARENTS AT 40 OR LIVE WITH YOUR EXES AT 30",
+  "a": "LIVE WITH YOUR PARENTS AT 40",
+  "b": "LIVE WITH YOUR EXES AT 30"
+ },
+ {
+  "id": "tot-021",
+  "type": "tot",
+  "text": "ONLY WHISPER OR ONLY SHOUT",
+  "a": "ONLY WHISPER",
+  "b": "ONLY SHOUT"
+ },
+ {
+  "id": "tot-022",
+  "type": "tot",
+  "text": "BE FAMOUS FOR A BAD VIDEO OR BE UNKNOWN FOREVER",
+  "a": "BE FAMOUS FOR A BAD VIDEO",
+  "b": "BE UNKNOWN FOREVER"
+ },
+ {
+  "id": "tot-023",
+  "type": "tot",
+  "text": "HAVE NO TASTE BUDS OR HAVE NO EYEBROWS",
+  "a": "HAVE NO TASTE BUDS",
+  "b": "HAVE NO EYEBROWS"
+ },
+ {
+  "id": "tot-024",
+  "type": "tot",
+  "text": "ALWAYS HAVE WET SOCKS OR ALWAYS HAVE A STONE IN YOUR SHOE",
+  "a": "ALWAYS HAVE WET SOCKS",
+  "b": "ALWAYS HAVE A STONE IN YOUR SHOE"
+ },
+ {
+  "id": "tot-025",
+  "type": "tot",
+  "text": "RESTART YOUR LIFE AT 15 OR FAST FORWARD TO 50",
+  "a": "RESTART YOUR LIFE AT 15",
+  "b": "FAST FORWARD TO 50"
+ },
+ {
+  "id": "never-001",
+  "type": "never",
+  "text": "NEVER HAVE I EVER PRETENDED TO BE ON THE PHONE"
+ },
+ {
+  "id": "never-002",
+  "type": "never",
+  "text": "NEVER HAVE I EVER GOOGLED MYSELF"
+ },
+ {
+  "id": "never-003",
+  "type": "never",
+  "text": "NEVER HAVE I EVER CRIED AT A DISNEY MOVIE"
+ },
+ {
+  "id": "never-004",
+  "type": "never",
+  "text": "NEVER HAVE I EVER LIKED AN OLD PHOTO BY ACCIDENT"
+ },
+ {
+  "id": "never-005",
+  "type": "never",
+  "text": "NEVER HAVE I EVER LIED ABOUT BEING SICK"
+ },
+ {
+  "id": "never-006",
+  "type": "never",
+  "text": "NEVER HAVE I EVER SENT A TEXT TO THE WRONG PERSON"
+ },
+ {
+  "id": "never-007",
+  "type": "never",
+  "text": "NEVER HAVE I EVER FALLEN ASLEEP IN A CLUB"
+ },
+ {
+  "id": "never-008",
+  "type": "never",
+  "text": "NEVER HAVE I EVER EATEN FOOD OFF THE FLOOR"
+ },
+ {
+  "id": "never-009",
+  "type": "never",
+  "text": "NEVER HAVE I EVER TALKED TO MYSELF IN THE MIRROR"
+ },
+ {
+  "id": "never-010",
+  "type": "never",
+  "text": "NEVER HAVE I EVER GHOSTED SOMEONE"
+ },
+ {
+  "id": "never-011",
+  "type": "never",
+  "text": "NEVER HAVE I EVER MISSED A FLIGHT OR TRAIN"
+ },
+ {
+  "id": "never-012",
+  "type": "never",
+  "text": "NEVER HAVE I EVER STALKED SOMEONE ONLINE FOR HOURS"
+ },
+ {
+  "id": "never-013",
+  "type": "never",
+  "text": "NEVER HAVE I EVER WAVED BACK AT SOMEONE WHO WAS NOT WAVING AT ME"
+ },
+ {
+  "id": "never-014",
+  "type": "never",
+  "text": "NEVER HAVE I EVER REGRETTED A TATTOO OR HAIRCUT"
+ },
+ {
+  "id": "never-015",
+  "type": "never",
+  "text": "NEVER HAVE I EVER SHOUTED AT A GAME CONTROLLER"
+ },
+ {
+  "id": "never-016",
+  "type": "never",
+  "text": "NEVER HAVE I EVER PRETENDED TO LIKE A GIFT"
+ },
+ {
+  "id": "never-017",
+  "type": "never",
+  "text": "NEVER HAVE I EVER SLEPT THROUGH AN ALARM ON PURPOSE"
+ },
+ {
+  "id": "never-018",
+  "type": "never",
+  "text": "NEVER HAVE I EVER SINGLE-HANDEDLY FINISHED A PIZZA"
+ },
+ {
+  "id": "never-019",
+  "type": "never",
+  "text": "NEVER HAVE I EVER USED A FAKE NAME AT A BAR"
+ },
+ {
+  "id": "never-020",
+  "type": "never",
+  "text": "NEVER HAVE I EVER FORGOTTEN SOMEONE'S NAME MID-CONVERSATION"
+ },
+ {
+  "id": "never-021",
+  "type": "never",
+  "text": "NEVER HAVE I EVER GOTTEN LOST WITH GPS ON"
+ },
+ {
+  "id": "never-022",
+  "type": "never",
+  "text": "NEVER HAVE I EVER READ A MESSAGE AND NEVER REPLIED"
+ },
+ {
+  "id": "never-023",
+  "type": "never",
+  "text": "NEVER HAVE I EVER TAKEN 40 SELFIES TO POST ONE"
+ },
+ {
+  "id": "never-024",
+  "type": "never",
+  "text": "NEVER HAVE I EVER LAUGHED AT THE WRONG MOMENT"
+ },
+ {
+  "id": "never-025",
+  "type": "never",
+  "text": "NEVER HAVE I EVER SPENT A WHOLE DAY IN BED"
+ }
+]

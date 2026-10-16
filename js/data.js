@@ -1,72 +1,31 @@
-// KABOOZE content: savage roast copy. Roast choices and behaviour only, never looks, weight, race, religion, sexuality or trauma.
-var QUESTIONS = [
-  "WHO WOULD GET LOST IN IKEA AND CALL 112?",
-  "WHO STILL HAS A MSN NAME WITH ~*~?",
-  "WHO WOULD CRY AT A DOG FOOD AD?",
-  "WHO GOES TO THE GYM ONLY FOR THE SELFIE?",
-  "WHO WOULD BE FIRST TO DIE IN A HORROR MOVIE BY SAYING 'HELLO?'",
-  "WHO WOULD START A FIGHT WITH A SELF CHECKOUT?",
-  "WHO TEXTS 'ALMOST THERE' FROM THE COUCH?",
-  "WHO WOULD CONFESS TO EVERYTHING BEFORE THE POLICE ASK?",
-  "WHO HAS 47 TABS OPEN AND NO REGRETS?",
-  "WHO WOULD TRY TO PET A WOLF?",
-  "WHO ORDERS A SALAD AND EATS HALF OF YOUR FRIES?",
-  "WHO WOULD SEND A 9 MINUTE VOICE MESSAGE?",
-  "WHO WOULD GET SCAMMED BY A PRINCE?",
-  "WHO WOULD ARGUE WITH SIRI AND LOSE?",
-  "WHO WOULD CRY FIRST WITHOUT WIFI FOR A DAY?",
-  "WHO PAYS 9 EURO FOR A BEER AND SAYS 'IT'S FINE'?",
-  "WHO WOULD GET BANNED FROM A KARAOKE BAR?",
-  "WHO WOULD FALL ASLEEP AT THEIR OWN BIRTHDAY?",
-  "WHO WOULD JOIN A PYRAMID SCHEME BY ACCIDENT?",
-  "WHO WOULD LIKE THEIR EX'S PHOTO FROM 2017 AT 3AM?",
-  "WHO BRINGS A SALAD TO A BBQ AND JUDGES EVERYONE?",
-  "WHO FAKES A PHONE CALL TO ESCAPE A CONVERSATION?",
-  "WHO WOULD CRY DURING THEIR OWN SPEECH?",
-  "WHO WOULD GET CHASED BY A SWAN?",
-  "WHO WOULD LOSE A STARING CONTEST WITH A GOAT?",
-  "WHO WOULD SAY 'I'M NOT DRUNK' WHILE HUGGING A BIN?",
-  "WHO WOULD TAKE A TAXI TO THE WRONG CITY?",
-  "WHO SECRETLY KNOWS EVERY WORD OF A CRINGE SONG?",
-  "WHO WOULD STEAL THE PEN FROM THE BANK?",
-  "WHO WOULD BUY A BOAT ON IMPULSE?"
-];
-
-var PROMPTS = [
-  'MOST LIKELY TO TEXT THEIR EX TONIGHT', 'MOST LIKELY TO BE SINGLE AT 50', 'MOST LIKELY TO CRY IN THE TOILETS',
-  'MOST LIKELY TO TALK BEHIND YOUR BACK', 'MOST LIKELY TO GET FIRED FOR A STUPID REASON', 'MOST LIKELY TO FORGET THE ROUND THEY OWE',
-  'MOST LIKELY TO START A FIGHT AND LEAVE EARLY', 'MOST LIKELY TO LOSE THEIR PHONE TONIGHT', 'MOST LIKELY TO FAKE A LAUGH AT YOUR JOKE',
-  'MOST LIKELY TO BECOME A BAD INFLUENCER', 'MOST LIKELY TO MARRY FOR MONEY', 'MOST LIKELY TO BE ON A TRUE CRIME PODCAST',
-  'MOST LIKELY TO CANCEL ON YOU LAST MINUTE', 'MOST LIKELY TO CRY WHEN DRUNK', 'MOST LIKELY TO JOIN A CULT',
-  'MOST LIKELY TO SLEEP WITH THEIR BOSS', 'MOST LIKELY TO LIE ON THEIR CV', 'MOST LIKELY TO ORDER FOR THE WHOLE TABLE AND GET IT WRONG',
-  'MOST LIKELY TO RUIN THE WEDDING', 'MOST LIKELY TO BE SECRETLY RICH AND CHEAP'
-];
-
-// Roulette applies to the bomb holder only. wt = real chance AND wheel slice size (BUY A ROUND = 4%).
-var ROULETTE = [
-  { w: 'DRINK 2', n: 'DRINK 2', k: 'drink', c: 2, wt: 14, d: 'TAKE TWO SIPS.' },
-  { w: 'TRUTH', n: 'TRUTH', k: 'truth', wt: 14 },
-  { w: 'SHOT', n: 'SHOT', k: 'drink', c: 3, wt: 10, d: 'TAKE A SHOT (OR 5 SIPS).' },
-  { w: 'DARE', n: 'DARE', k: 'dare', wt: 14 },
-  { w: 'DRINK 3', n: 'DRINK 3', k: 'drink', c: 3, wt: 10, d: 'TAKE THREE SIPS.' },
-  { w: 'CONFESS', n: 'CONFESS', k: 'confess', wt: 10 },
-  { w: 'SAFE', n: 'SAFE!', k: 'safe', wt: 14, d: 'PHEW. NOTHING HAPPENS.' },
-  { w: 'DOUBLE', n: 'DOUBLE NEXT ROUND', k: 'double', wt: 10, d: 'YOUR DRINKS COUNT X2 NEXT ROUND.' },
-  { w: 'ROUND', n: 'BUY A ROUND', k: 'buy', wt: 4, d: 'YOU BUY A ROUND FOR THE TABLE. RESPECT.' }
-];
-
-var TRUTHS = [
-  'WHO AT THIS TABLE WOULD YOU HOOK UP WITH?', 'WHAT IS THE WORST THING YOU DID ON A DATE?', 'WHO HERE DO YOU TRUST LEAST AND WHY?',
-  'WHAT LIE ARE YOU STILL LIVING?', 'WHAT IS THE MOST EMBARRASSING THING IN YOUR SEARCH HISTORY?', 'WHO WAS YOUR WORST EX AND WHAT DID THEY DO?',
-  'WHAT IS THE PETTIEST THING YOU EVER DID?', 'WHO HERE WOULD YOU DELETE FROM YOUR PHONE?', 'WHAT DO YOU SECRETLY JUDGE EVERYONE HERE FOR?',
-  'WHAT IS THE LAST THING YOU STOLE?', 'WHAT IS YOUR WORST DRUNK DECISION EVER?', 'WHO HERE IS THE FAKEST AND WHY?',
-  'WHAT WOULD YOU DO FOR 10000 EURO THAT YOU WOULD NEVER ADMIT?', 'WHAT IS THE WORST LIE YOU TOLD YOUR PARTNER?', 'WHAT SECRET ARE YOU SCARED GETS OUT?'
-];
-
-var DARES = [
-  'LET THE GROUP POST A STORY ON YOUR PHONE.', 'READ YOUR LAST 5 SEARCHES OUT LOUD.', 'CALL YOUR MOM AND SAY YOU LOVE HER, ON SPEAKER.',
-  'READ YOUR LAST TEXT TO YOUR EX OUT LOUD.', 'LET THE TABLE PICK YOUR NEXT PROFILE PICTURE.', 'SHOW THE LAST PHOTO IN YOUR CAMERA ROLL.',
-  'DO YOUR BEST IMPRESSION OF EVERYONE AT THE TABLE.', 'GIVE EACH PERSON ONE HONEST ROAST.', 'LET SOMEONE DRAW ON YOUR HAND WITH A PEN.',
-  'ADMIT YOUR WORST HABIT TO THE WHOLE TABLE.', 'TALK IN A POSH ACCENT UNTIL YOUR NEXT TURN.', 'SING THE LAST SONG YOU LISTENED TO, LOUD.',
-  'LET THE TABLE WRITE YOU A NEW NICKNAME AND USE IT ALL NIGHT.', 'SHOW YOUR SCREEN TIME TO EVERYONE.', 'TELL THE TABLE YOUR MOST CRINGE MEMORY.'
-];
+// Content loader. Source of truth: data/content.json (stable ids). js/content-fallback.js is a generated inline copy
+// used until/unless the fetch works. Items whose id is in localStorage "kabooze_removed" are skipped on this device.
+var QUESTIONS = [], PROMPTS = [], TRUTHS = [], DARES = [], ROULETTE = [], CATEGORIES = [], DILEMMAS = [], NEVERS = [];
+var REMOVED_KEY = 'kabooze_removed', CUSTOM_KEY = 'kabooze_custom';
+var CUSTOM_POSTS = [];   // {author, text}, matched to player names at game start
+function getCustom() { try { return JSON.parse(localStorage.getItem(CUSTOM_KEY)) || []; } catch (e) { return []; } }
+function getRemoved() { try { return JSON.parse(localStorage.getItem(REMOVED_KEY)) || []; } catch (e) { return []; } }
+function applyContent(items) {
+  var rm = getRemoved();
+  var map = [
+    ['who', QUESTIONS, function (x) { return x.text; }], ['likely', PROMPTS, function (x) { return x.text; }],
+    ['truth', TRUTHS, function (x) { return x.text; }], ['dare', DARES, function (x) { return x.text; }],
+    ['roulette', ROULETTE, function (x) { return x; }], ['category', CATEGORIES, function (x) { return x.text; }],
+    ['tot', DILEMMAS, function (x) { return { a: x.a, b: x.b }; }], ['never', NEVERS, function (x) { return x.text; }]
+  ];
+  map.forEach(function (m) {
+    var all = items.filter(function (x) { return x.type === m[0]; });
+    var keep = all.filter(function (x) { return rm.indexOf(x.id) < 0; });
+    if (!keep.length) keep = all;               // never leave a type empty
+    m[1].length = 0;
+    keep.forEach(function (x) { m[1].push(m[2](x)); });
+    getCustom().forEach(function (x) { if (x.type === m[0] && (x.text || x.a)) m[1].push(m[2](x)); });
+  });
+  CUSTOM_POSTS.length = 0;
+  getCustom().forEach(function (x) { if (x.type === 'post' && x.text) CUSTOM_POSTS.push({ author: x.author || '', text: x.text }); });
+}
+applyContent(FALLBACK_CONTENT);
+try {
+  fetch('data/content.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function (j) { if (Array.isArray(j) && j.length) applyContent(j); }).catch(function () {});
+} catch (e) {}
