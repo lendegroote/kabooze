@@ -160,9 +160,20 @@
     g.beginPath(); g.arc(80, 80, 78, 0, Math.PI * 2); g.strokeStyle = '#0b140b'; g.lineWidth = 3; g.stroke();
     return c;
   }
-  function pickSlice() {
-    var WT = getWT(), x = Math.random() * WT, acc = 0;
-    for (var i = 0; i < ROULETTE.length; i++) { acc += ROULETTE[i].wt; if (x < acc) return { i: i, mid: (acc - ROULETTE[i].wt + (x - (acc - ROULETTE[i].wt))) / WT * 360 }; }
+  // prank rule (roulette only, drink amounts untouched): len/remi always SAFE, laurens gets BUY A ROUND on his first spin of a game
+  function riggedSlice(name) {
+    var n = String(name || '').trim().toLowerCase();
+    if (n === 'len' || n === 'remi') return 'safe';
+    if (n === 'laurens') { var f = S.firstSpin = S.firstSpin || {}; if (!f[n]) { f[n] = 1; return 'buy'; } }
+    return null;
+  }
+  function pickSlice(name) {
+    var WT = getWT(), want = riggedSlice(name), x = Math.random() * WT, acc = 0, i;
+    if (want) {
+      for (i = 0, acc = 0; i < ROULETTE.length; i++) { if (ROULETTE[i].k === want) { x = acc + Math.random() * ROULETTE[i].wt; break; } acc += ROULETTE[i].wt; }
+      acc = 0;
+    }
+    for (i = 0; i < ROULETTE.length; i++) { acc += ROULETTE[i].wt; if (x < acc) return { i: i, mid: x / WT * 360 }; }
   }
   function resultText(r, who) {
     if (r.k === 'truth' || r.k === 'dare') {
@@ -189,7 +200,7 @@
     var spun = false;
     function spin() {
       if (spun) return; spun = true; snd('go');
-      var pk = pickSlice(), i = pk.i, deg = 360 * 5 + (360 - pk.mid);
+      var pk = pickSlice(nm(who)), i = pk.i, deg = 360 * 5 + (360 - pk.mid);
       c.style.transform = 'rotate(' + deg + 'deg)';
       res.innerHTML = '<div class="sub">...</div>';
       var iv = setInterval(function () { snd('tick'); }, 180);
@@ -479,7 +490,7 @@
   function stopGame() { clearGame(); wakeOff(); S.fuseOn = false; S.inGame = false; S.modal = false; $('#tb').classList.remove('hot'); }
   function startGame() {
     S.drinks = S.players.map(function () { return 0; });
-    S.usedQ = []; S.usedTD = []; S.dbl = []; S.rn = 0; S.secs = []; S.photos = []; S.askSec = true; S.inGame = true;
+    S.usedQ = []; S.usedTD = []; S.firstSpin = {}; S.dbl = []; S.rn = 0; S.secs = []; S.photos = []; S.askSec = true; S.inGame = true;
     S.fuseOn = false; S.fresh = true; S.modal = false; wakeOn();
     secrets(0, []);
   }

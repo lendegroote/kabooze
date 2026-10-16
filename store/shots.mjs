@@ -19,21 +19,21 @@ const shot = async name => { const r = await send('Page.captureScreenshot', { fo
 await send('Page.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 3, mobile: true });
 await send('Emulation.setTouchEmulationEnabled', { enabled: true });
-const players = ['LENNERT', 'MIRTE', 'JORIS', 'FIEN'].map((n, i) => ({ name: n, av: 'data:image/svg+xml;base64,' + fs.readFileSync(`../assets/sprites/player-${i + 1}.svg`).toString('base64') }));
+const players = ['LENNERT', 'MIRTE', 'BD', 'FIEN'].map((n, i) => ({ name: n, av: 'data:image/svg+xml;base64,' + fs.readFileSync(`../assets/sprites/player-${i + 1}.svg`).toString('base64') }));
 await send('Page.navigate', { url: 'http://127.0.0.1:8765/index.html' });
 await sleep(1500);
 await ev(`localStorage.clear(); localStorage.setItem('kabooze.players', ${JSON.stringify(JSON.stringify(players))}); location.reload()`);
 await sleep(2000);
 await shot('s1-title');
 // who said it
-await ev(`(function(){var K=KABOOZE,S=K.S; S.inGame=true; S.ans=[{q:'WIE KAN ECHT DE POT OP AAN DEZE TAFEL?',pick:2,by:2},{q:'WIE SLAAPT ALTIJD IN OP DE TREIN?',pick:1,by:1},{q:'WIE STUURT ZIJN EX NOG STEEDS MEMES?',pick:3,by:3}]; S.fresh=false; S.left=S.total=1e9; S.queue=['who']; K.runNext();})()`);
+await ev(`(function(){var K=KABOOZE,S=K.S; S.inGame=true; S.ans=[{q:'WIE ZEI: IK DRINK MAAR 1?',pick:2,by:2}]; S.fresh=false; S.left=S.total=1e9; S.queue=['who']; K.runNext();})()`);
 await sleep(800); await shot('s0-rule');
 await ev(`document.getElementById('go').click(); KABOOZE.S.left=KABOOZE.S.total=1e9; KABOOZE.S.fuseOn=false;`); await sleep(1500);
 await shot('s2-pass');
 await ev(`document.getElementById('ok').click()`); await sleep(1200);
 await shot('s3-guess');
 // kaboom
-await ev(`(function(){var o=document.getElementById('over'); o.hidden=false;o.className='boom';o.innerHTML='<div class="kb">KABOOM.</div><div class="big" style="font-size:15px">SKILL ISSUE, JORIS.</div><img class="av lg" src="${players[2].av}">';})()`);
+await ev(`(function(){var o=document.getElementById('over'); o.hidden=false;o.className='boom';o.innerHTML='<div class="kb">KABOOM.</div><div class="big" style="font-size:15px">SKILL ISSUE, BD.</div><img class="av lg" src="${players[2].av}">';})()`);
 await sleep(600); await shot('s4-kaboom');
 await ev(`(function(){var o=document.getElementById('over'); o.hidden=true;o.className='';KABOOZE.roulette(2);})()`);
 await sleep(800); await shot('s5-wheel');
