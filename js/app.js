@@ -19,12 +19,18 @@
     return [{ name: '', av: '' }, { name: '', av: '' }];
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S.players)); } catch (e) {} }
-  function snd(n) { if (S.snd) try { SFX[n](); } catch (e) {} }
+  function snd(n) { if (S.snd && !MUS.quiet) try { SFX[n](); } catch (e) {} }
   function nm(i) { return S.players[i].name || ('P' + (i + 1)); }
-  function show(html) { card.innerHTML = html; S.frozen = false; }
+  function setQuiet(q) {
+    if (q === !!MUS.quiet) return;
+    MUS.quiet = q;
+    if (q) MUS.stop(); else MUS.start();
+  }
+  function show(html) { card.innerHTML = html; S.frozen = false; setQuiet(false); }
   var showR = show;
   // input screens (typing, camera, private votes): the bomb fuse is frozen while someone is answering
-  function showF(html) { show(html); S.frozen = true; }
+  // they are also silent: no music, no SFX, no ticks
+  function showF(html) { card.innerHTML = html; S.frozen = true; setQuiet(true); }
   function go(fn) { stopCam(); S.cur = fn; fn(); }
 
   var initCache = {};
@@ -112,7 +118,7 @@
     S.left -= dt; S.acc += dt;
     var p = 1 - Math.max(S.left, 0) / S.total; MUS.mul = 1 + 0.25 * p;
     var iv = 1000 * Math.pow(0.12, Math.pow(p, 1.7));
-    if (S.acc >= iv) { S.acc = 0; if (S.snd) try { beep(900 + p * 900, 0.04, 0, 0.09); } catch (e) {} }
+    if (S.acc >= iv) { S.acc = 0; if (S.snd && !MUS.quiet) try { beep(900 + p * 900, 0.04, 0, 0.09); } catch (e) {} }
     $('#tb').classList.toggle('hot', S.left < 10000);
     if (S.left <= 0) explode();
   }, 40);
@@ -206,10 +212,11 @@
     function close() { over.hidden = true; over.className = ''; S.paused = was; }
     over.hidden = false; over.className = '';
     over.innerHTML = '<div class="box"><h2>PAUZE</h2>' + btn('m1', 'DOORGAAN', '#3bd16f') +
-      (S.inGame ? btn('m2', 'OPNIEUW BEGINNEN', '#ff9f1c') : '') + btn('m3', 'TERUG NAAR START', '#3ec6ff') +
+      (S.inGame ? btn('m2', 'SPEL HERSTARTEN', '#ff9f1c') : '') + btn('m8', 'OPNIEUW BEGINNEN', '#ff3b3b') + btn('m3', 'TERUG NAAR START', '#3ec6ff') +
       btn('m4', 'GELUID: ' + (S.snd ? 'AAN' : 'UIT'), '#ffd23f') + btn('m5', 'MUZIEK: ' + (MUS.on ? 'AAN' : 'UIT'), '#ffd23f') + btn('m6', 'INHOUD', '#3ec6ff') + btn('m7', 'VOLLEDIG SCHERM', '#3ec6ff') + '</div>';
     on('m1', close);
     on('m2', function () { close(); stopGame(); startGame(); });
+    on('m8', function () { close(); askWipe(); });
     on('m3', function () {
       close();
       if (!S.inGame) return go(title);
@@ -232,6 +239,15 @@
     over.innerHTML = '<div class="box"><h2>VOLLEDIG SCHERM</h2><div class="how"><div>ZET HEM OP JE STARTSCHERM VOOR VOLLEDIG SCHERM</div></div>' + btn('tx', 'OK', '#3bd16f') + '</div>';
     on('tx', function () { over.hidden = true; });
   }
+  function wipeAll() {
+    ['kabooze.players', 'kabooze.secrets', 'kabooze.photos'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+    stopGame(); stopCam();
+    S.players = [{ name: '', av: '' }, { name: '', av: '' }];
+    S.secs = []; S.photos = []; S.ans = []; S.drinks = []; S.usedQ = []; S.dbl = []; S.rn = 0; S.draft = '';
+    initCache = {};
+    go(setup);
+  }
+  function askWipe() { confirmBox('ALLES WISSEN? SPELERS, ANTWOORDEN EN FOTO\'S', wipeAll); }
   function confirmBox(msg, yes) {
     over.hidden = false; over.className = '';
     over.innerHTML = '<div class="box"><h2>' + msg + '</h2>' + btn('cy', 'JA', '#ff3b3b') + btn('cn', 'NEE', '#3bd16f') + '</div>';
@@ -304,8 +320,9 @@
     S.cur = title; bar();
     show('<div class="scr center"><div class="logo"><span class="r">K</span><span class="o">A</span><span class="y">B</span><canvas class="bomb" width="16" height="16"></canvas><span class="g">O</span><span class="c">Z</span><span class="p">E</span></div>' +
       '<div class="sub">HET DRINKSPEL MET EEN VERBORGEN BOM</div><div class="grow"></div><div class="inv-row"><canvas class="inv" width="11" height="8"></canvas><canvas class="bomb bigbomb" width="16" height="16"></canvas><canvas class="inv" width="11" height="8"></canvas></div><div class="grow"></div>' +
-      '<div style="width:100%">' + btn('start', 'START', '#3bd16f') + btn('how', 'HOE SPEEL JE', '#3ec6ff', 'sm') + '</div></div>');
-    card.querySelector('#how').style.width = '100%';
+      '<div style="width:100%">' + btn('start', 'START', '#3bd16f') + btn('how', 'HOE SPEEL JE', '#3ec6ff', 'sm') + btn('wipe', 'OPNIEUW BEGINNEN', '#ff3b3b', 'sm') + '</div></div>');
+    card.querySelector('#how').style.width = '100%'; card.querySelector('#wipe').style.width = '100%';
+    on('wipe', askWipe);
     on('start', function () { go(setup); });
     on('how', function () {
       over.hidden = false; over.className = '';
@@ -375,23 +392,32 @@
       RemiAvatar.fromFile(f.files[0]).then(function (c) { S.players[i].av = c.toDataURL(); save(); setup(); }).catch(function () { setup(); });
     });
   }
-  function camScreen(i, opt) {
+  function camScreen(i, opt, facing) {
     stopCam();
+    facing = facing || (opt ? 'environment' : 'user');
     var N = opt ? 64 : 32;
     showF('<div class="scr"><h2>' + (opt ? esc(opt.prompt) : 'LACH, ' + esc(nm(i))) + '</h2><div class="grow camwrap"><canvas id="cv" width="' + N + '" height="' + N + '"></canvas></div><div class="toast" id="toast">CAMERA STARTEN...</div><div id="cbtns" style="width:100%"></div></div>');
     var cam = S.cam = { stream: null, iv: 0, back: opt ? opt.done : null };
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false }).then(function (stream) {
-      if (S.cam !== cam) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
+    function camStart(fm) {
+    facing = fm;
+    clearInterval(cam.iv); if (cam.stream) cam.stream.getTracks().forEach(function (t) { t.stop(); }); cam.stream = null;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: fm }, audio: false }).then(function (stream) {
+      if (S.cam !== cam || facing !== fm) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
       cam.stream = stream;
       var v = document.createElement('video'); v.muted = true; v.setAttribute('playsinline', ''); v.srcObject = stream; v.play();
       var cv = $('#cv'), g = cv.getContext('2d'), small = document.createElement('canvas'), big = document.createElement('canvas');
       small.width = small.height = N * 2; big.width = big.height = 480;
       $('#toast').textContent = '';
-      $('#cbtns').innerHTML = btn('snap', 'FOTO!', '#3bd16f'); autoFoc();
-      cam.iv = setInterval(function () { if (v.videoWidth) g.drawImage(RemiAvatar.fromSource(camSquare(v, small, !!opt), N), 0, 0); }, 100);
+      $('#cbtns').innerHTML = btn('snap', 'FOTO!', '#3bd16f') + '<button class="btn sm" id="flip" style="--c:#3ec6ff;display:none">DRAAI CAMERA</button>'; autoFoc();
+      var flat = fm !== 'user';
+      if (navigator.mediaDevices.enumerateDevices) navigator.mediaDevices.enumerateDevices().then(function (d) {
+        var f = $('#flip'); if (f && d.filter(function (x) { return x.kind === 'videoinput'; }).length > 1) { f.style.display = ''; autoFoc(); }
+      }).catch(function () {});
+      on('flip', function () { camStart(fm === 'user' ? 'environment' : 'user'); });
+      cam.iv = setInterval(function () { if (v.videoWidth) g.drawImage(RemiAvatar.fromSource(camSquare(v, small, flat), N), 0, 0); }, 100);
       on('snap', function () {
         if (!v.videoWidth) return;
-        var out = RemiAvatar.fromSource(camSquare(v, big, !!opt), N);
+        var out = RemiAvatar.fromSource(camSquare(v, big, flat), N);
         clearInterval(cam.iv); stream.getTracks().forEach(function (t) { t.stop(); });
         g.drawImage(out, 0, 0); snd('ok');
         $('#cbtns').innerHTML = btn('use', 'GEBRUIK', '#3bd16f') + btn('re', 'OPNIEUW', '#ff9f1c'); autoFoc();
@@ -399,9 +425,11 @@
           if (opt) { opt.save(toJpeg(big)); stopCam(); return opt.done(); }
           S.players[i].av = out.toDataURL(); save(); stopCam(); setup();
         });
-        on('re', function () { camScreen(i, opt); });
+        on('re', function () { camScreen(i, opt, fm); });
       });
     }).catch(function () { if (S.cam === cam) camFail(i, opt); });
+    }
+    camStart(facing);
   }
 
   // ---------- game start ----------

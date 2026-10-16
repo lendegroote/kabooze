@@ -8,7 +8,7 @@ function unlock() {
   if (AC && AC.state === 'suspended') AC.resume();
 }
 function beep(f, d, delay, vol, slide) {
-  if (!AC) return;
+  if (!AC || MUS.quiet) return;
   var t0 = AC.currentTime + (delay || 0), v = vol || 0.07;
   var o = AC.createOscillator(), gn = AC.createGain();
   o.type = 'square';
@@ -75,7 +75,7 @@ var MUS = { on: true, run: false, hold: false, mul: 1, step: 0, next: 0, timer: 
     }
   }
   MUS.start = function () {
-    if (!AC || !MUS.on || MUS.run || MUS.hold) return;
+    if (!AC || !MUS.on || MUS.run || MUS.hold || MUS.quiet) return;
     if (AC.state === 'suspended') AC.resume();
     if (!MUS.gain) { MUS.gain = AC.createGain(); MUS.gain.connect(AC.destination); }
     if (!MUS.noise) { MUS.noise = AC.createBuffer(1, 2205, 44100); var d = MUS.noise.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
