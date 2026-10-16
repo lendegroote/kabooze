@@ -237,9 +237,9 @@
     var was = S.paused; S.paused = true;
     function close() { over.hidden = true; over.className = ''; S.paused = was; }
     over.hidden = false; over.className = '';
-    over.innerHTML = '<div class="box"><h2>PAUZE</h2>' + btn('m1', 'DOORGAAN', '#3bd16f') +
+    over.innerHTML = '<div class="box"><i id="sk" class="skey"></i><h2>PAUZE</h2>' + btn('m1', 'DOORGAAN', '#3bd16f') +
       (S.inGame ? btn('m2', 'SPEL HERSTARTEN', '#ff9f1c') : '') + btn('m8', 'OPNIEUW BEGINNEN', '#ff3b3b') + btn('m3', 'TERUG NAAR START', '#3ec6ff') +
-      btn('m4', 'GELUID: ' + (S.snd ? 'AAN' : 'UIT'), '#ffd23f') + btn('m5', 'MUZIEK: ' + (MUS.on ? 'AAN' : 'UIT'), '#ffd23f') + btn('m6', 'INHOUD', '#3ec6ff') + btn('m7', 'VOLLEDIG SCHERM', '#3ec6ff') + '<i id="sk" class="skey"></i></div>';
+      btn('m4', 'GELUID: ' + (S.snd ? 'AAN' : 'UIT'), '#ffd23f') + btn('m5', 'MUZIEK: ' + (MUS.on ? 'AAN' : 'UIT'), '#ffd23f') + btn('m6', 'INHOUD', '#3ec6ff') + btn('m7', 'VOLLEDIG SCHERM', '#3ec6ff') + '</div>';
     on('sk', function () {
       armed(true); var k = $('#sk'); k.classList.add('bl'); setTimeout(function () { k.classList.remove('bl'); }, 300);
       try { if (S.snd && AC) beep(1500, 0.03, 0, 0.02); } catch (e) {}

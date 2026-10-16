@@ -186,7 +186,7 @@ body.passing #screen { animation: passflash .25s steps(2) 5; }
 
 /* menu corner decoration */
 .box { position: relative; }
-.skey { position: relative; display: block; flex: none; margin: 6px auto 0; width: 44px; height: 44px; opacity: .85; cursor: default;
+.skey { position: absolute; top: 8px; right: 10px; z-index: 3; width: 40px; height: 40px; opacity: .85; cursor: default;
   background: var(--g2); clip-path: polygon(50% 0, 62% 38%, 100% 38%, 69% 60%, 81% 100%, 50% 75%, 19% 100%, 31% 60%, 0 38%, 38% 38%); }
 .skey::before { content: ''; position: absolute; inset: -10px; }
 .skey.bl { opacity: 1; }
