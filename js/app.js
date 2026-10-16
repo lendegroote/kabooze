@@ -7,7 +7,7 @@
 
   var S = {
     players: loadPlayers(), snd: true, paused: false, modal: false, fuseOn: false, left: 0, acc: 0,
-    drinks: [], dbl: [], rn: 0, total: 1, cur: null, holder: 0, ans: [], r1: null, r2: null, usedQ: [], inGame: false, draft: ''
+    drinks: [], posts: [], askPosts: false, r3: null, dbl: [], rn: 0, total: 1, cur: null, holder: 0, ans: [], r1: null, r2: null, usedQ: [], inGame: false, draft: ''
   };
 
   // ---------- helpers ----------
@@ -395,7 +395,7 @@
   function stopGame() { S.fuseOn = false; S.inGame = false; S.modal = false; $('#tb').classList.remove('hot'); }
   function startGame() {
     S.drinks = S.players.map(function () { return 0; });
-    S.usedQ = []; S.dbl = []; S.rn = 0; S.inGame = true; S.fuseOn = true; S.modal = false; resetFuse();
+    S.usedQ = []; S.dbl = []; S.rn = 0; S.posts = []; S.askPosts = true; S.inGame = true; S.fuseOn = true; S.modal = false; resetFuse();
     secrets(0, []);
   }
   function pass(i, next) {
@@ -414,7 +414,7 @@
     return pool[rnd(pool.length)];
   }
   function secrets(k, list) {
-    if (k >= S.players.length) { S.ans = list; return startR1(); }
+    if (k >= S.players.length) { S.ans = list; S.askPosts = false; return startR1(); }
     pass(k, function () {
       var q = newQ();
       go(function () {
@@ -427,7 +427,7 @@
         bindPicks(function (i) {
           S.usedQ.push(q); snd('ok');
           list.push({ by: k, q: q, pick: i });
-          secrets(k + 1, list);
+          if (S.askPosts) postScreen(k, function () { secrets(k + 1, list); }); else secrets(k + 1, list);
         });
         // reroll keeps the new question: S.cur re-reads q via closure
       });
@@ -451,41 +451,42 @@
       k = 0;
     }
     var a = r.left.splice(k, 1)[0], wrong = [];
-    pass(r.g, function () { guess(a, wrong); });
+    pass(r.g, function () { guess(a, wrong, r, 'q'); });
   }
-  function guess(a, wrong) {
-    var g = S.r1.g, all = S.players.map(function (p, i) { return i; });
+  function guess(a, wrong, L, kind) {
+    L = L || S.r1; var post = kind === 'post';
+    var g = L.g, all = S.players.map(function (p, i) { return i; });
     go(function () {
       S.holder = g;
-      show('<div class="scr"><div class="quote"><div class="qq">' + esc(a.q) + '</div><div class="aa y">&gt; ' + esc(nm(a.pick)) + '</div></div>' +
-        '<h2>WHO SAID IT?</h2><div class="scroll">' + pickGrid(all, null, function (i) { return wrong.indexOf(i) >= 0 ? 'bad' : ''; }) + '</div><div class="cd big" id="cd"></div><div class="toast" id="toast"></div></div>');
+      show('<div class="scr">' + (post ? postCard(a.text) : '<div class="quote"><div class="qq">' + esc(a.q) + '</div><div class="aa y">&gt; ' + esc(nm(a.pick)) + '</div></div><h2>WHO SAID IT?</h2>') +
+        '<div class="scroll">' + pickGrid(all, null, function (i) { return wrong.indexOf(i) >= 0 ? 'bad' : ''; }) + '</div><div class="cd big" id="cd"></div><div class="toast" id="toast"></div></div>');
       var tok = S.lockTok = {};
       function tick() {
         var grid = card.querySelector('.grid'), cd = $('#cd');
         if (S.lockTok !== tok || !grid || !cd) return;
-        var left = S.r1.lockUntil - Date.now();
+        var left = L.lockUntil - Date.now();
         if (left > 0) { grid.classList.add('lock'); cd.textContent = Math.ceil(left / 1000); setTimeout(tick, 100); }
         else { grid.classList.remove('lock'); cd.textContent = ''; $('#toast').textContent = ''; }
       }
-      if (S.r1.lockUntil > Date.now()) { $('#toast').textContent = 'NOPE. YOU KNOW NOBODY. ' + nm(g) + ' DRINK.'; tick(); }
+      if (L.lockUntil > Date.now()) { $('#toast').textContent = 'NOPE. YOU KNOW NOBODY. ' + nm(g) + ' DRINK.'; tick(); }
       bindPicks(function (i, b) {
-        if (S.r1.lockUntil > Date.now()) return;
-        if (i === a.by) return exposed(a);
+        if (L.lockUntil > Date.now()) return;
+        if (i === a.by) return post ? exposed(a, L, 2, 'POSTED THAT. DRINK 2, CRINGE.', nextPost) : exposed(a, L, 1, 'SAID IT. DRINK, SNITCH.', nextSecret);
         wrong.push(i); drink(g, 1); snd('bad');
         b.classList.add('shake', 'bad');
-        S.r1.lockUntil = Date.now() + 3000;
+        L.lockUntil = Date.now() + 3000;
         $('#toast').textContent = 'NOPE. YOU KNOW NOBODY. ' + nm(g) + ' DRINK.';
         tick();
       });
     });
   }
-  function exposed(a) {
-    snd('drink'); drink(a.by, 1); S.r1.g = a.by;
+  function exposed(a, L, n, msg, next) {
+    snd('drink'); drink(a.by, n); L.g = a.by;
     go(function () {
       S.holder = a.by;
-      show('<div class="scr center"><div class="grow"></div><div class="big r">EXPOSED!</div>' + av(a.by, 'xl') + '<div class="big y" style="font-size:15px">' + esc(nm(a.by)) + ' SAID IT. DRINK, SNITCH.</div><div class="grow"></div>' +
+      show('<div class="scr center"><div class="grow"></div><div class="big r">EXPOSED!</div>' + av(a.by, 'xl') + '<div class="big y" style="font-size:15px">' + esc(nm(a.by)) + ' ' + msg + '</div><div class="grow"></div>' +
         btn('nx', 'GO TO ' + esc(nm(a.by)), '#3bd16f') + '</div>');
-      on('nx', nextSecret);
+      on('nx', next);
     });
   }
 
@@ -497,7 +498,7 @@
   }
   function prompt2() {
     var r = S.r2;
-    if (r.p >= r.prompts.length) return loopScreen();
+    if (r.p >= r.prompts.length) return startR3();
     r.votes = []; vote(0);
   }
   function vote(v) {
@@ -528,6 +529,47 @@
     });
   }
 
+
+  // ---------- WHO POSTED THIS: optional round, posts only live in this phone's localStorage ----------
+  function savePosts() { try { localStorage.setItem('kabooze.posts', JSON.stringify(S.posts)); } catch (e) {} }
+  function postScreen(k, done) {
+    go(function () {
+      S.holder = k;
+      show('<div class="scr"><div class="quote"><div class="aa y" style="font-size:12px">TYPE YOUR CRINGIEST OLD FACEBOOK POST. BE HONEST.</div></div><div class="sub">NOBODY SEES THIS UNTIL THE ROUND. SKIP IS ALLOWED.</div>' +
+        '<input type="text" id="post" maxlength="90" placeholder="YOUR POST" autocomplete="off" spellcheck="false" value="' + esc(S.draft) + '"><div class="grow"></div>' + btn('psk', 'SKIP', '#ff9f1c') + btn('pok', 'OK', '#3bd16f') + '</div>');
+      var t = $('#post'); t.addEventListener('input', function () { S.draft = t.value; });
+      on('psk', function () { S.draft = ''; done(); });
+      on('pok', function () {
+        var v = t.value.trim(); S.draft = '';
+        if (v) { S.posts.push({ by: k, text: v, used: false }); savePosts(); }
+        snd('ok'); done();
+      });
+    });
+  }
+  function postCard(text) {
+    return '<div class="post"><div class="pbar">WALLBOOK 2009</div><div class="ph"><i class="pav"></i><div><b>???</b><span>MARCH 14 AT 02:13</span></div></div><div class="pt">' + esc(text) + '</div><div class="pf">LIKE - COMMENT - SHARE</div></div>';
+  }
+  function startR3() {
+    var avail = S.posts.filter(function (p) { return !p.used; });
+    if (!avail.length) return loopScreen();
+    S.rn++;
+    S.r3 = { left: shuffle(avail), g: rnd(S.players.length), lockUntil: 0 };
+    nextPost();
+  }
+  function nextPost() {
+    var r = S.r3;
+    if (!r.left.length) { S.posts = []; savePosts(); return loopScreen(); }
+    var k = -1;
+    for (var i = 0; i < r.left.length; i++) if (r.left[i].by !== r.g) { k = i; break; }
+    if (k < 0) {
+      var by = r.left[0].by;
+      do { r.g = rnd(S.players.length); } while (r.g === by);
+      k = 0;
+    }
+    var a = r.left.splice(k, 1)[0], wrong = []; a.used = true;
+    pass(r.g, function () { guess(a, wrong, r, 'post'); });
+  }
+
   // ---------- loop / end ----------
   function loopScreen() {
     go(function () {
@@ -537,7 +579,7 @@
     });
   }
   function endScreen() {
-    stopGame();
+    stopGame(); S.posts = []; savePosts();
     go(function () {
       bar();
       var ord = S.players.map(function (p, i) { return i; }).sort(function (a, b) { return S.drinks[b] - S.drinks[a]; });
