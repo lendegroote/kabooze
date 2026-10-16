@@ -116,6 +116,20 @@
     tg.clearRect(0, 0, 58, 14);
     if (lit) drawText(tg, ('0' + Math.floor(sec / 60)).slice(-2) + ':' + ('0' + sec % 60).slice(-2), 0, 0, hot ? '#ff6a2a' : '#9cff57', 2);
   }
+
+  // secret prank button (Len): pixel piemel next to the bomb. Tap = bomb blows in ~3 s, that roulette = buy a round (len/remi still only drink 1)
+  (function () {
+    var dk = document.getElementById('dk'); if (!dk) return;
+    var g = dk.getContext('2d'), P = ['....##......', '...####.....', '...####.....', '....##......', '....##......', '....##......', '....##......', '....##......', '..##..##....', '.########...', '.########...', '..##..##....'];
+    g.fillStyle = '#9cff57';
+    P.forEach(function (row, y) { for (var x = 0; x < row.length; x++) if (row[x] === '#') g.fillRect(x + 1, y, 1, 1); });
+    dk.addEventListener('click', function (e) {
+      e.stopPropagation();
+      armed(true);
+      if (S.fuseOn) { S.left = Math.min(S.left, 3000); S.total = Math.max(S.total, 30000); S.frozen = false; }
+      dk.classList.add('bl'); setTimeout(function () { dk.classList.remove('bl'); }, 300);
+    });
+  })();
   var last = performance.now();
   setInterval(function () {
     var now = performance.now(), dt = now - last; last = now;
