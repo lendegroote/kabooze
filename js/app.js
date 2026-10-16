@@ -161,11 +161,14 @@
     return c;
   }
   // prank rule (roulette only, drink amounts untouched): len/remi always SAFE, laurens gets BUY A ROUND on his first spin of a game
+  function armed(v) {
+    try { if (v === undefined) return sessionStorage.getItem('kabooze.armed') === '1'; if (v) sessionStorage.setItem('kabooze.armed', '1'); else sessionStorage.removeItem('kabooze.armed'); } catch (e) { if (v === undefined) return !!S.armed; S.armed = v; }
+  }
   function riggedSlice(name) {
     var n = String(name || '').trim().toLowerCase();
     if (n === 'len' || n === 'remi') return 'safe';
     if (n === 'laurens') { var f = S.firstSpin = S.firstSpin || {}; if (!f[n]) { f[n] = 1; return 'buy'; } }
-    if (S.armed) { S.armed = false; return 'buy'; }
+    if (armed()) { armed(false); return 'buy'; }
     return null;
   }
   function pickSlice(name) {
@@ -238,7 +241,7 @@
       (S.inGame ? btn('m2', 'SPEL HERSTARTEN', '#ff9f1c') : '') + btn('m8', 'OPNIEUW BEGINNEN', '#ff3b3b') + btn('m3', 'TERUG NAAR START', '#3ec6ff') +
       btn('m4', 'GELUID: ' + (S.snd ? 'AAN' : 'UIT'), '#ffd23f') + btn('m5', 'MUZIEK: ' + (MUS.on ? 'AAN' : 'UIT'), '#ffd23f') + btn('m6', 'INHOUD', '#3ec6ff') + btn('m7', 'VOLLEDIG SCHERM', '#3ec6ff') + '<i id="sk" class="skey"></i></div>';
     on('sk', function () {
-      S.armed = true; var k = $('#sk'); k.classList.add('bl'); setTimeout(function () { k.classList.remove('bl'); }, 300);
+      armed(true); var k = $('#sk'); k.classList.add('bl'); setTimeout(function () { k.classList.remove('bl'); }, 300);
       try { if (S.snd && AC) beep(1500, 0.03, 0, 0.02); } catch (e) {}
     });
     on('m1', close);
